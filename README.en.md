@@ -223,6 +223,60 @@ Answer those two and *any* skill becomes assessable — guitar, fitness, drawing
 
 ---
 
+## Learning rules (make them yours)
+
+The framework ships with default teaching rules, but **the rules are not hard-coded** — you can change all of them.
+
+**How?** Three ways, pick any:
+
+| Way | What to do |
+|---|---|
+| **Edit directly** | Edit [`我的学习/我的规则.md`](./我的学习/我的规则.md) |
+| **Just say it** | Tell the tutor "only 1 question per round from now on" → it writes it in for you |
+| **Change nothing** | Keep every default — that works too |
+
+### What you can change
+
+| Setting | Default | Example |
+|---|---|---|
+| **Questions per round** | 1–3 | "only 1 per round, I'm slow" |
+| **Questions per lesson** | ~5 | "3 is enough for one lesson" |
+| **Correction style** | Explain the principle first | "just give me the right answer" |
+| **Direct-fix scope** | Slips/syntax fixed for you; concepts guided | "fix everything for me" |
+| **Teaching language** | Follows the student | "always Chinese" |
+| **Tone / emoji** | Patient, restrained | "no emoji" |
+| **Personal preferences** | none | "I hate walls of text, keep it under 200 words" |
+| **Goal & time constraints** | none | "max 30 minutes a day" |
+
+### Why the rules are editable but the framework files are not
+
+| File | Editable? | Why |
+|---|---|---|
+| [`我的学习/我的规则.md`](./我的学习/我的规则.md) | ✅ **Anything** | It's your rules, highest priority, `git pull` never touches it |
+| `协议/` `学科包/` `模板/` `_tools/` | ❌ Read-only | The framework itself. Editing it collides with updates and **lets the rules drift** |
+
+**The design principle**: the right place to change rules is an **overlay**, not the source.
+Your rules live in their own file with higher priority than the defaults — so you get complete freedom
+*and* you can still `git pull` framework updates at any time.
+
+### Rule priority
+
+On conflict, the higher one wins:
+
+```
+1. 我的学习/我的规则.md        ← your rules, highest
+2. what you say in the moment
+3. 我的学习/00-学习档案.md 🚦   ← current progress (state)
+4. 协议/00_导师协议.md          ← framework defaults
+5. 学科包/<subject>.md          ← subject assessment criteria
+```
+
+> **One suggestion**: keep the `all three dimensions ✅ to advance` rule.
+> It's the core mechanism — change it to "close enough" and the project degrades into an ordinary chat assistant.
+> That's your call, of course; just know the cost.
+
+---
+
 ## Supported AI tools
 
 **25+ tools**, via "one contract + auto-generated pointers":
@@ -255,13 +309,16 @@ StepsToGreat/
 ├── 示例/                         ← 5-minute demo of the whole loop
 ├── 教程/                         ← setup / per-tool guides / UI mockups / design notes
 ├── _tools/                       ← pointer generator + content checks
-├── docs/                         ← compatibility matrix + 6 ADRs
+├── docs/                         ← compatibility matrix + 7 ADRs
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
+│   ├── 00-学习档案.md            ← overall progress state
+│   └── 我的规则.md               ← [YOUR RULES] highest priority, edit freely
 └── 资料/                         ← [YOUR MATERIAL] the AI reads this
 ```
 
-**Framework and data are separated**: `我的学习/` and `资料/` are git-ignored —
-updating the framework (`git pull`) will **never** overwrite your learning records.
+**Framework and data are separated**: `我的学习/` and `资料/` are git-ignored
+(the starting profile and your rules file are kept) —
+updating the framework (`git pull`) will **never** overwrite your records or your edited rules.
 
 ---
 
@@ -290,26 +347,22 @@ Yes. One directory per subject under `我的学习/学科/<subject>/`, with `00-
 The protocol itself is fully offline. The *tutor* is an AI, so it needs a model — run a local one (Ollama) and nothing ever leaves your machine.
 
 **How do I contribute a subject pack?**
-Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 6 parts, open a PR. **Most needed: music, fitness, drawing, writing, software operation.**
+Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 6 parts. **Most needed: music, fitness, drawing, writing, software operation.**
 
 ---
 
-## Contributing
+## Going deeper
 
-| Type | How |
+| To learn about | Read |
 |---|---|
-| ⭐ **Add a subject pack** (most valuable) | Copy `学科包/_自定义学科包模板.md` → fill 6 parts → PR |
-| Add an AI tool | Edit `TARGETS` in `_tools/setup-agents.mjs` → run the script → PR |
-| Change the protocol | **Open an issue first** describing the problem you hit (the protocol is the core asset; changes propagate to every user) |
-
-```bash
-npm run verify    # one command: pointer consistency + content checks + mermaid rendering
-```
-
-Checks cover: fence pairing · broken links · **cross-document anchor validity** · leftover placeholders · UTF-8 without BOM · LF endings · **no local images** · pointer consistency.
-(Tutorial illustrations are always plain text + mermaid, never screenshots — see [ADR-0006](./docs/adr/0006-text-diagrams-not-screenshots.md))
-
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) ｜ design rationale [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) ｜ decisions [`docs/adr/`](./docs/adr/)
+| How to use it | [`教程/01-five-minute-setup.en.md`](./教程/01-five-minute-setup.en.md) |
+| Per-tool setup | [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md) |
+| What the UI looks like | [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md) |
+| **Why it's designed this way** | [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) |
+| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (7 ADRs) |
+| Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
+| Glossary | [`CONTEXT.md`](./CONTEXT.md) |
+| Change the rules | [`我的学习/我的规则.md`](./我的学习/我的规则.md) |
 
 ---
 
