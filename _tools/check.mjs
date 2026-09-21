@@ -39,7 +39,9 @@ const PLACEHOLDER_PATTERNS = [
   /lorem ipsum/gi,
 ];
 
-/** 图片引用：本项目约定教程不用截图（见 ADR-0006），出现 .png/.jpg 引用应报错 */
+/** 图片引用：本项目约定教程不用**本地截图**（见 ADR-0006）。
+ *  只禁本地/相对路径图片 —— 外部徽章（shields.io、CI badge）是实时生成的，
+ *  不会过时、不需人工补拍，不属于「截图」，因此放行。 */
 const IMAGE_REF_RE = /!\[[^\]]*\]\(([^)]+\.(?:png|jpe?g|gif|webp|svg))\)/gi;
 
 /** 框架文件（占位词检查范围） */
@@ -196,13 +198,16 @@ for (const abs of files) {
     }
   }
 
-  // ── 图片引用（本项目约定：教程不用截图，见 ADR-0006）───────
+  // ── 本地图片引用（本项目约定：教程不用本地截图，见 ADR-0006）───
   {
     let im;
     IMAGE_REF_RE.lastIndex = 0;
     while ((im = IMAGE_REF_RE.exec(prose)) !== null) {
+      const target = im[1].trim();
+      // 放行外部图片（徽章等）：ADR-0006 禁的是会过时的本地截图
+      if (/^(https?:)?\/\//i.test(target)) continue;
       problems.push(
-        `${rp}: 引用了图片 ${im[1]} —— 本项目约定教程用纯文本示意图（见 docs/adr/0006）`,
+        `${rp}: 引用了本地图片 ${target} —— 本项目约定教程用纯文本示意图（见 docs/adr/0006）`,
       );
     }
   }
