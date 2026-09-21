@@ -259,6 +259,18 @@ ${pointer('Kiro')}`,
 > 且支持嵌套 \`AGENTS.md\`（就近生效）。**你不需要本文件** —— 它只是为了让目录结构自解释而存在。
 `),
   },
+
+  // ── DSH（DeepSeek Harness）───────────────────────────────────
+  {
+    path: '.dsh/README.md',
+    body: pointer('DSH（DeepSeek Harness）', `
+> **DSH 注意**：DSH 通过内置的 \`dsh-agent-instructions\` 插件**原生读取根目录 \`AGENTS.md\`**（默认候选还包括
+> \`CLAUDE.md\`；\`AGENTS.local.md\` / \`CLAUDE.local.md\` 是本地叠加层），会话首次请求时自动注入，
+> **零配置**。默认预算 65,536 字节（\`maxBytes\`），本项目远小于此。
+> **你不需要本文件** —— 它只是为了让目录结构自解释而存在。
+> 文档：https://www.npmjs.com/package/@deepseek-ai/dsh-agent-instructions
+`),
+  },
 ];
 
 /** 兼容性矩阵，写进 docs/AGENT-COMPAT.md */
@@ -266,6 +278,7 @@ const MATRIX = [
   ['工具', '规则文件', '是否原生读 AGENTS.md', '需要学生手动做什么'],
   ['---', '---', '---', '---'],
   ['OpenAI Codex CLI', 'AGENTS.md', '✅ 标准发起方，零配置', '无'],
+  ['**DSH（DeepSeek Harness）**', 'AGENTS.md（+ CLAUDE.md；`AGENTS.local.md` 为本地叠加）', '✅ 原生（`dsh-agent-instructions` 插件自动注入），零配置', '无（预算默认 65,536 字节；不扫子目录）'],
   ['**ZCode（智谱 Z.ai）**', 'AGENTS.md（工作区 + `~/.zcode/AGENTS.md`）', '✅ 原生，零配置', '无（不读 CLAUDE.md；**不扫子目录**，规则只放根目录）'],
   ['Cursor', 'AGENTS.md / .cursor/rules', '✅ 零配置', '无'],
   ['Qoder（阿里）', 'AGENTS.md / .qoder/rules', '✅ 零配置', '无'],

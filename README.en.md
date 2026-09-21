@@ -658,7 +658,7 @@ On conflict, the higher one wins:
 
 ## Supported AI tools
 
-**25+ tools**, via "one contract + auto-generated pointers":
+**25+ tools** (currently 26 pointer files, covering 28+ tools), via "one contract + auto-generated pointers":
 
 ```
 your tool → the file it reads (CLAUDE.md / CODEBUDDY.md / .trae/rules / GEMINI.md …)
@@ -669,7 +669,7 @@ Change a rule in exactly one place (`AGENTS.md`); the other 25 pointer files are
 
 | Works out of the box | Needs one switch | Pointer provided |
 |---|---|---|
-| Codex · Cursor · Qoder · ZCode · Cline · Roo · Kilo · Zed · goose · Warp · Windsurf · Kiro · Augment · Junie · Amazon Q | **Trae** (in settings) | Claude Code · CodeBuddy · WorkBuddy · Gemini CLI · Continue · Antigravity · Qwen Code · Aider |
+| Codex · Cursor · Qoder · ZCode · **DSH** · Cline · Roo · Kilo · Zed · goose · Warp · Windsurf · Kiro · Augment · Junie · Amazon Q | **Trae** (in settings) | Claude Code · CodeBuddy · WorkBuddy · Gemini CLI · Continue · Antigravity · Qwen Code · Aider |
 
 📋 Full matrix (with each tool's exact behaviour): [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md)
 

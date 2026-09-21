@@ -15,6 +15,7 @@
 | 工具 | 规则文件 | 是否原生读 AGENTS.md | 需要学生手动做什么 |
 |---|---|---|---|
 | OpenAI Codex CLI | AGENTS.md | ✅ 标准发起方，零配置 | 无 |
+| **DSH（DeepSeek Harness）** | AGENTS.md（+ CLAUDE.md；`AGENTS.local.md` 为本地叠加） | ✅ 原生（`dsh-agent-instructions` 插件自动注入），零配置 | 无（预算默认 65,536 字节；不扫子目录） |
 | **ZCode（智谱 Z.ai）** | AGENTS.md（工作区 + `~/.zcode/AGENTS.md`） | ✅ 原生，零配置 | 无（不读 CLAUDE.md；**不扫子目录**，规则只放根目录） |
 | Cursor | AGENTS.md / .cursor/rules | ✅ 零配置 | 无 |
 | Qoder（阿里） | AGENTS.md / .qoder/rules | ✅ 零配置 | 无 |

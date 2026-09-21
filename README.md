@@ -654,7 +654,7 @@ for i in range(1, 11):
 
 ## 支持哪些 AI 工具
 
-**25+ 个**，原理是「单一契约 + 自动生成跳板」：
+**25+ 个**（现为 26 个跳板文件，覆盖 28+ 工具），原理是「单一契约 + 自动生成跳板」：
 
 ```
 你的工具 → 它认的文件（CLAUDE.md / CODEBUDDY.md / .trae/rules / GEMINI.md …）
@@ -665,7 +665,7 @@ for i in range(1, 11):
 
 | 零配置直接用 | 需要开个开关 | 需跳板（已生成） |
 |---|---|---|
-| Codex · Cursor · Qoder · ZCode · Cline · Roo · Kilo · Zed · goose · Warp · Windsurf · Kiro · Augment · Junie · Amazon Q | **Trae**（设置里开） | Claude Code · CodeBuddy · WorkBuddy · Gemini CLI · Continue · Antigravity · Qwen Code · Aider |
+| Codex · Cursor · Qoder · ZCode · **DSH** · Cline · Roo · Kilo · Zed · goose · Warp · Windsurf · Kiro · Augment · Junie · Amazon Q | **Trae**（设置里开） | Claude Code · CodeBuddy · WorkBuddy · Gemini CLI · Continue · Antigravity · Qwen Code · Aider |
 
 📋 完整矩阵（含每个工具的确切行为）：[`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md)
 
