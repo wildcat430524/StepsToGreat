@@ -11,6 +11,8 @@ A Markdown protocol — any AI tool that opens it becomes your personal teacher:
 it runs a placement test, teaches lessons, grades your work, explains *what you got wrong and why*,
 then records your progress so you can pick up where you left off.
 
+**Nothing to install for the learner.** No Node, no npm, no API key, no account.
+
 [简体中文](./README.md) | English
 
 ---
@@ -21,7 +23,7 @@ AI is already good enough to teach. **What was always missing isn't content — 
 
 | Your current situation | How StepsToGreat fixes it |
 |---|---|
-| You ask ChatGPT "how do I learn Python?" — it hands you a roadmap, and then… nothing | The AI runs a placement test → finds your real level → plans the route → **ships lesson 1** |
+| You ask an AI "how do I learn Python?" — it hands you a roadmap, and then… nothing | The AI runs a placement test → finds your real level → plans the route → **ships lesson 1** |
 | You finish a lesson; nobody checks whether you actually got it | Three-dimension assessment: **all ✅ before you may advance** |
 | You get something wrong; the AI says "not quite" — and you still don't know where | Small mistakes are **fixed for you**, with the full "what you wrote → what's wrong and why → what I changed it to" |
 | Close the chat and it forgets everything | State is written to files: **switch tools, come back a month later, keep going** |
@@ -40,25 +42,52 @@ AI is already good enough to teach. **What was always missing isn't content — 
 
 ---
 
+## Who it's for — and who it's not for
+
+**Said up front, so you don't waste a download.**
+
+| ✅ Good fit | ❌ Not a fit |
+|---|---|
+| Self-studying a skill, but always quitting halfway | Wanting ready-made course videos / textbooks — **this project ships no content** |
+| Wanting someone to watch you and check your work | Wanting a "ask one question, get one answer" assistant |
+| A concrete goal (an exam / a project / a weak spot) | No goal at all, just browsing |
+| Willing to **write answers** (typing or on paper) | Wanting to listen passively without doing exercises |
+| Studying long-term (weeks to years) | Looking up a single fact once |
+| You have your own material (textbooks / past papers / notes) | Expecting the AI to invent a curriculum from memory |
+
+> **In one line**: if what you want is *someone who sets questions, grades them, and makes you practise* — this fits.
+> If what you want is *content*, go find a course. This project handles **the person watching you**.
+
+---
+
 ## How it works
 
-```
-You: I'm the student. Read AGENTS.md first, then start.
-
-AI:  (reads the protocol) → asks 3 questions → placement test (5–8 questions)
-     → sets your level → plans the route → ships lesson 1
-
-You: done.
-
-AI:  (re-reads your answers — never from memory)
-     → assesses every question on three dimensions → fixes and explains → files the result → next lesson
+```mermaid
+flowchart TD
+    A["① First open<br/>AI reads AGENTS.md"] --> B["② Requirements<br/>asks you 3 questions"]
+    B --> C["③ Placement test<br/>5–8 questions"]
+    C --> D["④ Sets your level + plans the route"]
+    D --> E["⑤ Ships lesson 1"]
+    E --> F["⑥ You answer"]
+    F --> G["⑦ You say 'done'"]
+    G --> H["⑧ AI re-reads the files<br/>never from memory"]
+    H --> I["⑨ Assesses all three dimensions<br/>every question in one pass"]
+    I --> J{"All ✅ ?"}
+    J -->|"No"| K["Small: fixed directly + explained<br/>Big: you derive it yourself"]
+    K --> G
+    J -->|"Yes"| L["⑩ Files the result + next lesson"]
+    L --> F
 ```
 
 **You only ever say two things**: the opening line, and "**done**".
 
-### The core mechanism: three dimensions, all ✅ to advance
+---
 
-Every topic is assessed on three **independent** dimensions — this is the soul of the project:
+## Core mechanics
+
+### 1. Three dimensions — all ✅ to advance
+
+Every topic is assessed on three **independent** dimensions — the soul of the project:
 
 | Dimension | Programming | English | Math | Humanities |
 |---|---|---|---|---|
@@ -67,25 +96,54 @@ Every topic is assessed on three **independent** dimensions — this is the soul
 | ③ **Form** | Does it compile | Grammar | Notation | Presentation |
 
 > **All three ✅ = mastered, and only then may you advance.** Any ⚠️ means keep practising.
->
-> Why three independent ones? Concept alone → can talk but can't do. Logic alone → right answer, can't explain.
-> Form alone → pretty but wrong. Collapse them into one "overall score" and you can no longer tell
-> "understood but slipped" from "didn't understand at all" — and those need completely different responses.
 
-### Small mistakes get fixed for you; big ones you derive yourself
+**Why three independent ones?** Concept alone → can talk but can't do. Logic alone → right answer, can't explain.
+Form alone → pretty but wrong. Collapse them into one "overall score" and you can no longer tell
+"understood but slipped" from "didn't understand at all" — and those need completely different responses.
+
+### 2. Small mistakes get fixed for you; big ones you derive yourself
 
 Typos, single-point syntax, missing symbols — **small problems**, and the AI **fixes them directly**
-so you don't burn a round-trip. But it must explain in three parts:
+so you don't burn a round-trip. **Big problems** (wrong concept, broken logic) stay Socratic — you derive
+the fix, because that *is* the learning.
+
+Here's what it actually looks like (real format):
 
 ```
-① What you wrote   for i in range(5): print(i)
-② What's wrong     range(5) is 0~4, but the task wants 1~5; missing a 5, extra a 0
-③ What I changed   for i in range(1, 6): print(i)
+You: done.
+
+AI:  I re-read your answers (5 questions). Assessment:
+
+| # | Concept | Logic   | Form    | Verdict   |
+|---|---------|---------|---------|-----------|
+| 1 | ✅      | — N/A   | — N/A   | pass      |
+| 2 | ✅      | ✅      | — N/A   | pass      |
+| 3 | ✅      | ✅      | ✅      | pass      |
+| 4 | ✅      | ✅      | ✅      | pass      |
+| 5 | ✅      | ⚠️      | ✅      | needs work|
+
+## 1️⃣ Problem 5: wrong loop range
+
+**What you wrote**
+for i in range(5):
+    print(i)
+
+**What's wrong**
+- range(5) yields 0,1,2,3,4 — starts at 0, stops before 5
+- The task wants 1 to 5, so you lose the 5 and gain a 0
+- This is Python's "inclusive start, exclusive end" convention — the classic beginner trap
+
+**What I changed it to**
+for i in range(1, 6):
+    print(i)
+
+The other 4 were fine — you got them right. Tell me when you've fixed it.
 ```
 
-**Big problems** (wrong concept, broken logic) stay Socratic — you derive the fix, because that *is* the learning.
+> Note that last line: "**the other 4 were fine**". The protocol requires saying so explicitly —
+> otherwise the student assumes silence means something is wrong.
 
-### State lives in exactly three places
+### 3. State lives in exactly three places
 
 | Location | Answers |
 |---|---|
@@ -98,6 +156,18 @@ So you can **close it and come back any time** and pick up where you left off.
 ---
 
 ## Five-minute setup
+
+### The learner installs nothing
+
+| | |
+|---|---|
+| ❌ No Node.js / npm | The protocol is plain Markdown — no build step |
+| ❌ No Git | Downloading a ZIP works just as well |
+| ❌ No API key | The recommended tools ship with a free tier |
+| ❌ No sign-up for this project | No server, no account, no subscription |
+| ✅ All you need | One AI tool that can open a folder |
+
+### Five steps
 
 - [ ] **1. Install an AI tool** — recommended: [Trae](https://www.trae.cn): free, Chinese UI, graphical, no API key
 
@@ -127,7 +197,9 @@ So you can **close it and come back any time** and pick up where you left off.
 
   The correct answer is **9**. Can't answer → go back to steps 2 and 3.
 
-📖 Full tutorial: [`教程/01-five-minute-setup.en.md`](./教程/01-five-minute-setup.en.md) ｜ UI mockups (plain text, no screenshots): [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md)
+📖 Full tutorial: [`教程/01-five-minute-setup.en.md`](./教程/01-five-minute-setup.en.md)
+🖼 UI mockups (plain text, no screenshots): [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md)
+🔍 Stuck? [§9 troubleshooting decision tree](./教程/ui-mockups.en.md#9-when-something-breaks-start-with-this-diagram)
 
 ---
 
@@ -143,7 +215,11 @@ So you can **close it and come back any time** and pick up where you left off.
 | **Anything else** | The AI generates a subject pack on the spot (music, fitness, writing…) |
 
 Five subject packs are built in ([programming](./学科包/编程.en.md) / [language](./学科包/语言.en.md) / [humanities](./学科包/文科.en.md) / [science](./学科包/理科.en.md) / [exam prep](./学科包/考试.en.md)).
-No match? The AI generates one from [`_自定义学科包模板.md`](./学科包/_自定义学科包模板.md) — **the crux is two questions: in this subject, what is a "structural error" (must lose points), and what is a "slip" (no penalty)?**
+
+**No match?** The AI generates one from [`_自定义学科包模板.md`](./学科包/_自定义学科包模板.md) —
+the crux is two questions: **in this subject, what is a "structural error" (must lose points), and what is a "slip" (no penalty)?**
+
+Answer those two and *any* skill becomes assessable — guitar, fitness, drawing, writing, software operation.
 
 ---
 
@@ -198,7 +274,7 @@ No. Everything is plain Markdown under `我的学习/`. Switch tools → open th
 The protocol is free. Most AI tools have free tiers (Trae CN: 500 credits/month). The protocol is plain Markdown — no server, no account, no subscription.
 
 **Do I need to be technical?**
-No. Opening a folder and typing is enough.
+No. Opening a folder and typing is enough. **The learner installs no Node / npm / Git.**
 
 **Will my material be uploaded?**
 Some tools do (Trae temporarily uploads for indexing; CodeBuddy's personal edition goes through Tencent Cloud).
@@ -209,6 +285,9 @@ Say so, with your reasoning. The protocol **explicitly lets you challenge it** �
 
 **Can I study several subjects at once?**
 Yes. One directory per subject under `我的学习/学科/<subject>/`, with `00-学习档案.md` covering the whole.
+
+**Can I use it offline?**
+The protocol itself is fully offline. The *tutor* is an AI, so it needs a model — run a local one (Ollama) and nothing ever leaves your machine.
 
 **How do I contribute a subject pack?**
 Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 6 parts, open a PR. **Most needed: music, fitness, drawing, writing, software operation.**
@@ -227,7 +306,7 @@ Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包�
 npm run verify    # one command: pointer consistency + content checks + mermaid rendering
 ```
 
-Checks cover: fence pairing · broken links · **cross-document anchor validity** · leftover placeholders · UTF-8 without BOM · LF endings · **no image references** · pointer consistency.
+Checks cover: fence pairing · broken links · **cross-document anchor validity** · leftover placeholders · UTF-8 without BOM · LF endings · **no local images** · pointer consistency.
 (Tutorial illustrations are always plain text + mermaid, never screenshots — see [ADR-0006](./docs/adr/0006-text-diagrams-not-screenshots.md))
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) ｜ design rationale [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) ｜ decisions [`docs/adr/`](./docs/adr/)
@@ -242,15 +321,6 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) ｜ design rationale [`教程/03-desi
 | **Docs** (protocol, subject packs, tutorials, templates) | [CC BY 4.0](./LICENSE-DOCS) |
 
 Please keep attribution when republishing teaching material.
-
----
-
-## Origin
-
-The teaching protocol was distilled from a **real 22-lesson Java self-study project** (started 2026-03),
-validated through Socratic guidance + mastery learning + three-dimension assessment, then generalised —
-mistakes included: replying only "fixed it" and being corrected on the spot, firing 7 edits at once and having every one fail,
-writing the same progress into 5 different places so the next tutor couldn't tell which was authoritative.
 
 ---
 
