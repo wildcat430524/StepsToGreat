@@ -37,8 +37,47 @@ AI is already good enough to teach. **What was always missing isn't content — 
 | Remembers your progress | ❌ Context only; gone when closed | ✅ Written to `我的学习/00-学习档案.md` |
 | Makes you practise | ❌ Only answers when asked | ✅ Sets questions → waits for "done" → assesses |
 | Points out your mistakes | ⚠️ Usually just gives the right answer | ✅ Three-part explanation, separating slips from real gaps |
+| **Probes your actual needs** | ❌ You say "teach me English" and it just starts | ✅ **Keeps asking until it's sure it understands you** |
 | Switching tools | ❌ History lost | ✅ Works anywhere |
 | Who owns the data | The platform | ✅ Your own folder |
+
+### Why the results differ: the AI keeps probing until it truly understands you
+
+The biggest problem with an ordinary AI isn't bad answers — it's that **it never checks whether it understood you correctly**.
+You say "teach me English" and it starts teaching. Teach *whom*? For an exam or for conversation? How long can you study per day? What's your level? It knows none of this — and **it doesn't ask**.
+
+This project writes "**probe until confirmed**" into the protocol. On first contact, the AI sounds like this:
+
+```
+You: Teach me English.
+
+AI:  Before we start, I need to be sure I actually understand you —
+     I'll keep going until I can restate your goal back to you.
+
+     1. "Learn English" — for what exactly?
+        a) An exam (CET / IELTS / grad school)
+        b) Speaking and conversation
+        c) Reading papers / watching shows
+     2. What's your current level? Open any English article, read for 30 seconds,
+        and tell me roughly how much you understood.
+     3. How much time can you *reliably* invest per day? (Give the real number,
+        not the ideal one — I'll plan lessons around it.)
+
+… (you answer, and the AI restates what it understood) …
+
+AI:  Here's the goal as I understand it —
+     "Pass CET-6 within 4 months; currently ~50% reading comprehension;
+      40 minutes a day, more on weekends. Prioritise reading and listening,
+      sprint writing before the exam."
+
+     Right? Correct me if anything is off. **I won't start teaching until you confirm.**
+```
+
+**The key design point**: the probing isn't small talk — it's **disambiguation**. Every answer becomes
+an input to the placement test and the course route. When you later ask "why is the course ordered this way?",
+the answer traces back to what you confirmed on day one.
+
+> This probing behaviour is written into `AGENTS.md` too — **whatever AI tool you use, it will ask the same way**.
 
 ---
 
