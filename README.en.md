@@ -152,6 +152,52 @@ Problem 1 was fine — you got it right. Tell me when you've fixed it, and we'll
 
 So you can **close it and come back any time** and pick up where you left off.
 
+### 3. The Feynman technique: can't explain it = don't really know it
+
+**The most dangerous thing isn't "not knowing" — it's "thinking you know".**
+
+Ordinary questions can be beaten by pattern-matching, memorising templates, or sheer familiarity — **getting it right doesn't mean you understood it**.
+So the tutor will **occasionally** ask you to explain a concept **in words a layperson would understand**:
+
+```
+AI: You may not use these words: <closure>, <scope>, <reference>
+
+    Explain, in a way your mum could follow: why does this function "remember"
+    the variable outside it? 3–5 sentences is enough.
+
+You: (explains…)
+
+AI: Your "backpack you carry around" analogy is good — the backpack holds
+    the variables it remembers. But you stumbled on "the backpack updates itself",
+    and that's exactly the crux. Just re-explain that part; no need to redo the whole thing.
+```
+
+**Why it beats an ordinary question**:
+
+| Ordinary question | Feynman question |
+|---|---|
+| Can be beaten by formulas, templates, familiarity | You must build the sentences yourself — no shortcuts |
+| Correct ≠ understood | **Can't explain it = definitely didn't understand it** (almost never a false positive) |
+| Tests "can you do it" | Tests "**do you actually get it**" |
+
+**The frequency is adaptive — it won't pester you**:
+
+| More likely to be asked | Can be skipped |
+|---|---|
+| Abstract concepts, principles, easily-confused ideas | Pure operations, memorisation material |
+| You're new to the field / explained poorly before | You already apply it fluently / explained well before |
+| **End of a major module** (e.g. "OOP is done") | Mid-module, progressing smoothly |
+
+**Hard limits** (written into the protocol to prevent overuse):
+
+- ✅ End of a major module → **one is mandatory**; any single concept is asked **at most twice**
+- ❌ **Not every lesson**; never two Feynman questions in consecutive rounds
+- ✅ If you say "I'd rather not explain — just test me" → the tutor **respects that** and switches to ordinary questions
+- ✅ A Feynman question **only scores conceptual understanding**, and that round **contains only that one question** (it takes much longer than an ordinary one)
+
+> Each subject pack has its own section on this — the constraints differ:
+> programming **bans writing code**, science **bans writing formulas**, humanities **must give concrete examples**, exam prep **uses it sparingly**.
+
 ---
 
 ## A complete conversation walkthrough
@@ -379,6 +425,51 @@ Answer round 1's 2 questions, then say "done".
 > ⏳ Review reminder (non-blocking): you've mastered 3 topics — before the next lesson I'll ask 1 synthesis question.
 ```
 
+### Day 7 · one Feynman question (the loops module is done)
+
+> The "loops" module just finished (for / while / break / nesting). Per the protocol,
+> **the end of a major module always triggers one Feynman question** — and that round
+> **contains only that one question**.
+
+**AI**:
+```
+The loops module is done. This round has just 1 question, and it isn't an ordinary one — it's a **Feynman question**.
+
+You may not use these words: <loop>, <iterate>, <traverse>, <range>
+
+**Explain, in a way your mum could follow: why does a computer need a "do something repeatedly" feature?**
+
+3–5 sentences is enough. Analogies and everyday examples are welcome.
+
+> This isn't an exam. Struggling is normal — struggling is exactly the signal that there's a gap here, which is what we want to find.
+```
+
+**You**:
+```
+It's like laundry. You don't wash each piece by hand — you throw the whole pile
+into the machine, set a program, and it spins on its own. A computer's the same:
+you don't write the same code a hundred times, you just tell it "for this whole
+pile of things, do the same action to each one".
+```
+
+**AI**:
+```
+✅ Explained clearly. And better than I expected.
+
+**What's good about it**: your "washing machine" analogy is very accurate — it captures two things at once:
+① you don't repeat the labour (that's writing the code once instead of a hundred times)
+② you have to "set the program" first (that's what goes inside the loop body)
+
+**One thing that could be more precise**: you said "it spins on its own" — but a computer is far more rigid than a washing machine. It will **never come up with the number of spins by itself**; you must state that number in advance. That's exactly what the next lesson (while) fixes.
+
+Filed to the profile: `for loops and range()` note = ✅ and can explain it Feynman-style
+```
+
+> 💡 Note the three things this feedback does:
+> **① names specifically what was good** (the analogy captured two things at once) — not a lazy "good job"
+> **② points out one thing that could be more precise**, and **leans into the next lesson** (while exists precisely because the count isn't always fixed)
+> **③ files the Feynman evidence into the profile** — stronger proof of mastery than merely getting questions right
+
 ### Day 10 · back after a week away
 
 **You** (new session, different AI tool):
@@ -413,14 +504,15 @@ Shall we do that review question now? (1 question covering variables / data type
 | Three-dimension assessment (all questions of the round, one pass) | Lesson 3 |
 | **Small problems fixed directly + three-part explanation** | Problem 2 (syntax) |
 | **Big problems guided, you derive it** | Problem 3 (logic) |
+| **Feynman question (end of a major module, only 1 question)** | Day 7 |
 | Explicitly saying "the questions I didn't change were fine" | "Question 1 was right" |
 | Further reading precise to chapter | Every lesson |
 | Filing (answer doc + three places in the profile) | After each lesson passes |
 | **Switch tools / come back a week later and resume** | Day 10 |
 
 > Want to verify these mechanisms are actually written into the protocol? See
-> [`协议/00_导师协议.en.md`](./协议/00_导师协议.en.md) (three-dimension assessment, direct-fix protocol, 1–3 questions per round)
-> and [`AGENTS.md`](./AGENTS.md) (11 hard rules). **The dialogue is the protocol's output, not decoration.**
+> [`协议/00_导师协议.en.md`](./协议/00_导师协议.en.md) (three-dimension assessment, direct-fix protocol, 1–3 questions per round, Feynman technique)
+> and [`AGENTS.md`](./AGENTS.md) (12 hard rules). **The dialogue is the protocol's output, not decoration.**
 
 ---
 
@@ -578,7 +670,7 @@ StepsToGreat/
 ├── 示例/                         ← 5-minute demo of the whole loop
 ├── 教程/                         ← setup / per-tool guides / UI mockups / design notes
 ├── _tools/                       ← pointer generator + content checks
-├── docs/                         ← compatibility matrix + 7 ADRs
+├── docs/                         ← compatibility matrix + 8 ADRs
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
 │   ├── 00-学习档案.md            ← overall progress state
 │   └── 我的规则.md               ← [YOUR RULES] highest priority, edit freely
@@ -628,7 +720,7 @@ Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包�
 | Per-tool setup | [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md) |
 | What the UI looks like | [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md) |
 | **Why it's designed this way** | [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) |
-| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (7 ADRs) |
+| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (8 ADRs) |
 | Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
 | Glossary | [`CONTEXT.md`](./CONTEXT.md) |
 | Change the rules | [`我的学习/我的规则.md`](./我的学习/我的规则.md) |

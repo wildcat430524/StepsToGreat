@@ -286,6 +286,91 @@ if (existsSync(profile)) {
   }
 }
 
+// ── 文档里写死的数量是否与实际一致（防「改了实际但忘了改文档」）──
+{
+  // ADR 数量
+  const adrDir = join(ROOT, 'docs', 'adr');
+  const adrCount = existsSync(adrDir)
+    ? readdirSync(adrDir).filter((f) => f.endsWith('.md')).length
+    : 0;
+
+  const countClaims = [
+    { file: 'README.md', re: /(\d+)\s*篇架构决策记录/g, what: 'ADR 数量' },
+    { file: 'README.md', re: /docs\/adr\/\)（(\d+)\s*篇）/g, what: 'ADR 数量' },
+    { file: 'README.en.md', re: /(\d+)\s*ADRs/g, what: 'ADR 数量' },
+  ];
+
+  for (const claim of countClaims) {
+    const abs = join(ROOT, claim.file);
+    if (!existsSync(abs)) continue;
+    const text = readFileSync(abs, 'utf8');
+    let cm;
+    while ((cm = claim.re.exec(text)) !== null) {
+      const claimed = Number(cm[1]);
+      if (claimed !== adrCount) {
+        problems.push(
+          `${claim.file}: 文档写「${claimed} 篇 ${claim.what}」，实际是 ${adrCount} 篇 —— 请同步`,
+        );
+      }
+    }
+  }
+
+  // 跳板文件数量
+  const pointerClaim = /(\d+)\s*个跳板文件/g;
+  for (const f of ['README.md', 'README.en.md', 'AGENTS.md', '协议/00_导师协议.md']) {
+    const abs = join(ROOT, f);
+    if (!existsSync(abs)) continue;
+    const text = readFileSync(abs, 'utf8');
+    let pm;
+    while ((pm = pointerClaim.exec(text)) !== null) {
+      const claimed = Number(pm[1]);
+      if (claimed !== 25) {
+        problems.push(`${f}: 文档写「${claimed} 个跳板文件」，实际是 25 个 —— 请同步`);
+      }
+    }
+  }
+
+  // 硬规则条数：以 AGENTS.md 的「## 2. 硬规则」小节实际编号条目数为准
+  {
+    const abs = join(ROOT, 'AGENTS.md');
+    if (existsSync(abs)) {
+      const lines = readFileSync(abs, 'utf8').split('\n');
+      let inSec = false;
+      let rules = 0;
+      for (const l of lines) {
+        if (/^##\s*2\.\s*硬规则/.test(l)) { inSec = true; continue; }
+        if (inSec && /^##\s/.test(l)) break;
+        if (inSec && /^\d+\.\s/.test(l)) rules++;
+      }
+      // 检查声称「硬规则 N 条」的地方。
+      // 注意：要排除「硬规则第 N 条」这种「引用某条编号」的写法（不是声称总数）。
+      for (const f of ['README.md', 'README.en.md', 'AGENTS.md', 'AGENTS.en.md', '协议/00_导师协议.md', '协议/00_导师协议.en.md', '教程/界面示意图.md', '教程/ui-mockups.en.md']) {
+        const p = join(ROOT, f);
+        if (!existsSync(p)) continue;
+        const text = readFileSync(p, 'utf8');
+        // 中文：「硬规则」共 N 条 / 硬规则 N 条（不含「第 N 条」）
+        for (const re of [
+          /硬规则[」\s]*(?:共\s*)?(\d+)\s*条/g,
+          /(\d+)\s*条\s*硬规则/g,
+          /答出\s*\*{0,2}(\d+)\s*条/g,
+          /(\d+)\s*hard rules/gi,
+          /hard rules[^\d]{0,4}(\d+)/gi,
+          /has\s+(\d+)\s+items/gi,
+          /answers?\s+\*{0,2}(\d+)/gi,
+        ]) {
+          let rm;
+          while ((rm = re.exec(text)) !== null) {
+            const claimed = Number(rm[1]);
+            if (claimed !== rules) {
+              problems.push(`${f}: 文档写「硬规则 ${claimed} 条」，实际是 ${rules} 条 —— 请同步`);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 // ── 输出 ─────────────────────────────────────────────────────
 console.log('');
 console.log(`📁 检查了 ${fileCount} 个 Markdown 文件`);

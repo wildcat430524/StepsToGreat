@@ -36,7 +36,7 @@ flowchart LR
     B --> C["3. Flip the rules switch<br/>(required in Trae)"]
     C --> D["4. Say the first sentence<br/>I'm the student, read AGENTS.md"]
     D --> E{"5. Verify<br/>ask it to recite the hard rules"}
-    E -->|"answers 9"| F["✅ Start learning"]
+    E -->|"answers 12"| F["✅ Start learning"]
     E -->|"can't"| B
 ```
 
@@ -253,24 +253,31 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 │  You: Recite the "Hard rules" section of AGENTS.md —          │
 │       how many are there?                                     │
 │                                                               │
-│  AI:  AGENTS.md's "Hard rules" has 9 items:                   │
+│  AI:  AGENTS.md's "Hard rules" has 12 items:                  │
 │       1. When the student says "done" → re-read the answer    │
 │          document before assessing; never judge from memory   │
-│       2. Assess all of this submission's questions in one     │
+│       2. Assess all of **this round's** questions in one      │
 │          pass; no drip-feeding corrections                    │
 │       3. Small problems: the tutor fixes them directly (with  │
 │          the three-part explanation); big problems stay       │
 │          Socratic                                             │
-│       4. After a re-assessment passes, file per the event     │
-│          table; change only three places in the profile       │
+│       4. File by round: append this round's result; write the │
+│          final re-assessment and update the profile only      │
+│          when the whole lesson passes                         │
 │       5. Read a file before editing it                        │
-│       6. Student messages are 3–5 words; settle with one      │
-│          multiple-choice round instead of two                 │
-│       7. Every new lesson ships with "📚 Further reading",    │
+│       6. Each round has 1–3 questions; next round only when   │
+│          this round is all ✅                                 │
+│       7. Settle preferences in one go, but practice questions │
+│          go round by round                                    │
+│       8. Every new lesson ships with "📚 Further reading",    │
 │          precise to title and chapter                         │
-│       8. Never teach from parametric memory; every claim      │
+│       9. Never teach from parametric memory; every claim      │
 │          must be traceable                                    │
-│       9. Do not modify 协议/ 模板/ 学科包/ _tools/            │
+│      10. Use the Feynman technique as a diagnostic (adaptive  │
+│          frequency; always once at a major module's end)      │
+│      11. Do not modify 协议/ 模板/ 学科包/ _tools/            │
+│      12. Rule-level requests → write them into 我的规则.md,   │
+│          never edit the framework                             │
 │                                                               │
 │      ✅ I've read the protocol and I'm ready.                 │
 │         What would you like to learn?                         │
@@ -279,7 +286,7 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 
 | Result | Verdict | Next step |
 |---|---|---|
-| Answers **9** | ✅ all good | just say "I want to learn X" |
+| Answers **12** | ✅ all good | just say "I want to learn X" |
 | Can't / says file not found | ❌ rules not active | back to step 4 (did you open the folder?) → step 5 (is the switch on?) |
 | Vague, wrong count | ⚠️ partially active | try another tool, or paste `AGENTS.md` in manually |
 
