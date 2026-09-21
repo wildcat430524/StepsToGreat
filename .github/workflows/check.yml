@@ -1,0 +1,22 @@
+name: 内容质检 / Content check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 跳板文件是否齐全且与脚本一致
+        run: node _tools/setup-agents.mjs --check
+
+      - name: 内容质检（围栏 / 链接 / 占位词 / 编码 / 行尾）
+        run: node _tools/check.mjs

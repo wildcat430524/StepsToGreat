@@ -1,0 +1,22 @@
+# 强制行尾为 LF（项目约定，跨平台一致）
+* text=auto eol=lf
+
+# 明确二进制文件
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.exe binary
+
+# 生成的跳板文件：在 GitHub 上折叠 diff 噪音（可选）
+CLAUDE.md linguist-generated=true
+CODEBUDDY.md linguist-generated=true
+GEMINI.md linguist-generated=true
+QWEN.md linguist-generated=true
+CONVENTIONS.md linguist-generated=true
+WARP.md linguist-generated=true
+.rules linguist-generated=true
+.goosehints linguist-generated=true
+docs/AGENT-COMPAT.md linguist-generated=true

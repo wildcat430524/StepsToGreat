@@ -1,0 +1,26 @@
+{
+  "name": "steps-to-great",
+  "version": "1.0.0",
+  "private": true,
+  "description": "打开这个文件夹，就有一位一对一导师。A Markdown teaching protocol that turns any AI tool into a one-on-one tutor.",
+  "type": "module",
+  "scripts": {
+    "setup": "node _tools/setup-agents.mjs",
+    "check": "node _tools/check.mjs",
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs"
+  },
+  "keywords": [
+    "ai-tutor",
+    "education",
+    "agents-md",
+    "learning",
+    "mastery-learning",
+    "socratic",
+    "markdown",
+    "prompt-engineering"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

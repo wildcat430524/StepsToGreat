@@ -1,0 +1,44 @@
+name: 学科包建议 / Subject pack request
+description: 提议新增一个学科包
+title: "[学科包] "
+labels: ["subject-pack"]
+body:
+  - type: input
+    id: subject
+    attributes:
+      label: 学科名
+      placeholder: 例：吉他 / 健身 / 雅思写作
+    validations:
+      required: true
+
+  - type: textarea
+    id: structural
+    attributes:
+      label: 这个学科里，什么是「结构性错误」（必须扣分）？
+      description: 这是学科包成立的关键判据。例：吉他 → 指法错误、节奏错拍
+    validations:
+      required: true
+
+  - type: textarea
+    id: slip
+    attributes:
+      label: 什么是「手滑」（不扣分）？
+      description: 例：吉他 → 换把时轻微杂音、手写谱记错小节号
+    validations:
+      required: true
+
+  - type: textarea
+    id: dim3
+    attributes:
+      label: 建议的第三个维度叫什么？
+      description: 编程叫「语法可编译」、英语叫「表达规范」、数学叫「推导规范」。你这个学科呢？
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 补充说明（可选）
+      description: 出题形态、验证方式、常用资料等
+    validations:
+      required: false

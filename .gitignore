@@ -1,0 +1,45 @@
+# ── 你的数据：不进入版本控制 ───────────────────────────────
+# 学习记录（进度、作业、评估结论）—— 保留起始档案，其余忽略
+我的学习/**
+!我的学习/00-学习档案.md
+!我的学习/README.md
+
+# 你自己放的学习资料
+资料/**
+!资料/README.md
+
+# ── 常见资料格式兜底（万一放到了别处）─────────────────────
+*.pdf
+*.epub
+*.mobi
+*.docx
+*.pptx
+*.zip
+*.rar
+*.7z
+
+# ── 编辑器 / 系统 ─────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── AI 工具的本地缓存 ─────────────────────────────────────
+.cursor/cache/
+.trae/cache/
+.continue/cache/
+.aider*
+*.aider.chat.history.md
+*.aider.input.history
+
+# ── Node ─────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# ── 临时文件 ──────────────────────────────────────────────
+*.tmp
+*.bak
+*.log
