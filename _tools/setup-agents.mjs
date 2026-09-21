@@ -384,7 +384,7 @@ for (const t of TARGETS) {
 
 if (CHECK_ONLY) {
   if (missing.length === 0 && drifted.length === 0) {
-    console.log(`✅ 全部跳板文件齐全且与脚本一致（${TARGETS.filter((t) => !t.skip).length + 1} 个）`);
+    console.log(`✅ 全部跳板文件齐全且与脚本一致（${TARGETS.filter((t) => !t.skip).length} 个跳板 + 1 个真相 AGENTS.md）`);
     process.exit(0);
   }
   if (missing.length) console.error(`❌ 缺失 ${missing.length} 个：\n  ${missing.join('\n  ')}`);
@@ -392,5 +392,5 @@ if (CHECK_ONLY) {
   process.exit(1);
 }
 
-console.log(`\n✅ 已生成 ${written} 个跳板文件。真相始终是 AGENTS.md。`);
+console.log(`\n✅ 已生成 ${written} 个跳板文件（+ 1 个真相 AGENTS.md）。真相始终是 AGENTS.md。`);
 console.log('   提示：换工具不需要改任何规则，只要该工具认上面任意一个文件即可。');

@@ -315,12 +315,12 @@ if (existsSync(profile)) {
     }
   }
 
-  // 跳板文件数量：以 setup-agents.mjs 实际生成的为准（动态统计，不再硬编码）
+  // 跳板文件数量：以 setup-agents.mjs 的 TARGETS 实际「path:」条目为准（动态统计，不硬编码）
   {
-    // 从脚本里数 TARGETS 数组中「有 path 且无 skip 标记」的条目
     const setupSrc = readFileSync(join(ROOT, '_tools', 'setup-agents.mjs'), 'utf8');
     const targetsBlock = setupSrc.split('const TARGETS = [')[1]?.split(/\n\];/)[0] ?? '';
-    const pointerCount = (targetsBlock.match(/^\s*\{\s*$/gm) || []).length
+    // 每个跳板条目必有 path 字段；AGENTS.md 真相条目有 skip: true，不计入跳板数
+    const pointerCount = (targetsBlock.match(/path:\s*'/g) || []).length
       - (targetsBlock.match(/skip:\s*true/g) || []).length;
 
     const pointerClaim = /(\d+)\s*个跳板文件/g;
