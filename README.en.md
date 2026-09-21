@@ -47,7 +47,7 @@ Recommended: **Trae** (free, Chinese UI, GUI, no API key needed) —
 
 Alternatives: **ZCode** (Z.ai — reads AGENTS.md natively, zero config), **CodeBuddy** (Tencent), **Qoder** (Alibaba), **Cursor**.
 
-Full comparison → [`教程/02-各工具接入指南.md`](./教程/02-各工具接入指南.md)
+Full comparison → [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md)
 
 ### 2. Open the folder
 
@@ -174,7 +174,7 @@ For sensitive material, use a local-model tool (Zed / goose + Ollama).
 **What if the AI grades me wrong?**
 Say so, with your reasoning. The protocol lets you challenge it.
 
-More → [`教程/01-五分钟上手.md`](./教程/01-五分钟上手.md)
+More → [`教程/01-five-minute-setup.en.md`](./教程/01-five-minute-setup.en.md)
 
 ---
 
@@ -189,7 +189,7 @@ node _tools/setup-agents.mjs   # regenerate all pointer files
 node _tools/check.mjs          # content quality check
 ```
 
-Design rationale → [`教程/03-设计说明.md`](./教程/03-设计说明.md)
+Design rationale → [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md)
 
 ---
 

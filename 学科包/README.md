@@ -2,6 +2,7 @@
 
 > 一个学科包 = 一个 Markdown 文件，定义**这个学科的三维评估长什么样**。
 > 导师在教学前必须先读本 README 选包；没有对口的，照 [`_自定义学科包模板.md`](./_自定义学科包模板.md) 现场生成一个。
+> English version: [`README.en.md`](./README.en.md)
 
 ---
 
