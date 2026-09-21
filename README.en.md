@@ -112,17 +112,14 @@ Here's what it actually looks like (real format):
 ```
 You: done.
 
-AI:  I re-read your answers (5 questions). Assessment:
+AI:  I re-read your answers (2 questions this round). Assessment:
 
 | # | Concept | Logic   | Form    | Verdict   |
 |---|---------|---------|---------|-----------|
 | 1 | ✅      | — N/A   | — N/A   | pass      |
-| 2 | ✅      | ✅      | — N/A   | pass      |
-| 3 | ✅      | ✅      | ✅      | pass      |
-| 4 | ✅      | ✅      | ✅      | pass      |
-| 5 | ✅      | ⚠️      | ✅      | needs work|
+| 2 | ✅      | ⚠️      | ✅      | needs work|
 
-## 1️⃣ Problem 5: wrong loop range
+## 1️⃣ Problem 2: wrong loop range
 
 **What you wrote**
 for i in range(5):
@@ -137,11 +134,13 @@ for i in range(5):
 for i in range(1, 6):
     print(i)
 
-The other 4 were fine — you got them right. Tell me when you've fixed it.
+Problem 1 was fine — you got it right. Tell me when you've fixed it, and we'll move to round 2.
 ```
 
-> Note that last line: "**the other 4 were fine**". The protocol requires saying so explicitly —
+> Note two details:
+> ① "**Problem 1 was fine — you got it right**" — the protocol requires saying so explicitly,
 > otherwise the student assumes silence means something is wrong.
+> ② "**we'll move to round 2**" — a round is only 1–3 questions, and the next round comes only when this one is all ✅.
 
 ### 3. State lives in exactly three places
 
@@ -152,6 +151,276 @@ The other 4 were fine — you got them right. Tell me when you've fixed it.
 | ⏳ To-do Table | What's pending |
 
 So you can **close it and come back any time** and pick up where you left off.
+
+---
+
+## A complete conversation walkthrough
+
+> ⚠️ **Note**: the walkthrough below is a **scenario reconstruction** — derived step by step from this
+> project's protocol, realistic and faithful to how it behaves, but **not** a verbatim transcript
+> (this project collects no user conversations). It shows what the dialogue looks like once the protocol is running.
+>
+> Scenario: a Python beginner whose goal is "write scripts to process Excel", from first opening the folder
+> to passing lesson 3, with a one-week gap in between.
+
+### Day 1 · First open
+
+**You**:
+```
+I'm the student. Please read AGENTS.md first, then begin.
+```
+
+**AI**:
+```
+I've read AGENTS.md and the protocol. Your learning profile is still empty, so let's start with requirements.
+
+Three questions (answer them in one go):
+1. Why Python? → I want to automate Excel; it's for work
+2. Have you done this before? → Never touched it
+3. What do you want to be able to do? → Write scripts that batch-edit Excel
+
+Then I'll run a placement test (5–8 questions, but sent in a few rounds — not dumped on you at once).
+```
+
+**You**:
+```
+1 for work 2 never 3 batch edit excel
+```
+
+**AI**:
+```
+Noted. Placement, round 1 — 2 questions:
+
+**Question 1**: What's the difference between `print("hi")` and `x = 1`?
+
+**Question 2**: Write one line that adds `3` and `5` and prints the result.
+
+(Hint: if you don't remember the syntax for Q2, just write the part you know.)
+```
+
+> 💡 **Note**: the placement test follows the same "1–3 questions per round" rule — no 8-question dump.
+
+### Placement result (middle steps omitted)
+
+**AI**:
+```
+✅ Result: your level is L1, absolute beginner.
+
+   - Already have: Excel familiarity, you know what a cell is
+   - Need to build: variables, loops, file I/O
+   - Start at: lesson 1, "Variables and Data Types"
+   - Estimated 8 lessons to reach "write a script that batch-edits Excel"
+
+Written to 我的学习/学科/Python/00-摸底测试.md, and the first 5 lessons are planned.
+Ready to start lesson 1?
+```
+
+### Lesson 3 · one typical round
+
+**AI** (ships the lesson):
+```
+**Next: #3 for loops and range()** (you'll need this to process every row of Excel)
+
+### 📁 Where the files are
+- Teaching guide: 我的学习/学科/Python/03-for循环/01_教学引导.md
+- Answer document: 我的学习/学科/Python/03-for循环/01_学生回答.md
+
+### 📖 This lesson's key points
+1. What a for loop iterates over
+2. range()'s inclusive-start, exclusive-end rule
+3. Using the loop variable
+4. When *not* to use for
+5. The infinite-loop trap
+
+### 📚 Further reading
+- Required: *Python Crash Course* §4.1–4.3 (read before)
+- Optional: official docs, "for Statements" (reference after)
+- Self-test source: §4 exercises 4-3 ~ 4-5
+
+### ✅ Your task
+Read the guide, answer **round 1's 2 questions** in the answer document, then say "done".
+```
+
+**You** (answering in `01_学生回答.md`):
+```python
+# Round 1 · Q1: Which numbers does range(3) print? Why?
+# A: 0 1 2, because range starts at 0
+
+# Round 1 · Q2: Write code that prints 1 to 5
+for i in range(5):
+    print(i)
+```
+
+**You**:
+```
+done
+```
+
+**AI**:
+```
+I re-read your answer document (2 questions this round):
+
+| # | Concept | Logic   | Form    | Verdict   |
+|---|---------|---------|---------|-----------|
+| 1 | ✅      | — N/A   | — N/A   | pass      |
+| 2 | ✅      | ❌      | ✅      | needs work|
+
+---
+
+## 1️⃣ Problem 2: wrong loop range
+
+**What you wrote**
+for i in range(5):
+    print(i)
+
+**What's wrong**
+- range(5) yields 0,1,2,3,4 — starts at 0, stops before 5
+- The task wants 1 to 5; your output is 0 to 4 — **missing the 5, extra the 0**
+- This is Python's "inclusive start, exclusive end" convention — the classic beginner trap
+
+**What I changed it to**
+for i in range(1, 6):
+    print(i)
+
+---
+
+Question 1 was right — "range starts at 0" is the key insight.
+
+Fix Q2 and tell me, and we'll go to round 2.
+```
+
+> 💡 Three protocol rules on display:
+> **① assess every question of the round in one pass** (no drip-feeding)｜**② small problems are fixed for you** (no wasted round-trip)｜**③ the three-part explanation** (what you wrote → why it's wrong → what I changed it to)
+
+### Big problems get guidance, not a fix
+
+Round 2 asks you to "print the even numbers from 1 to 10". You write:
+
+```python
+for i in range(1, 11):
+    print(i)
+```
+
+**AI**:
+```
+## 1️⃣ Problem 3: the even-number check is missing
+
+This one is different from the last — that was a **syntax** problem (I fixed it directly).
+This is a **logic** problem, and you need to work it out yourself.
+
+Your code prints every number from 1 to 10, but the task only wants the **even** ones.
+
+Don't write code yet. Answer me this:
+
+> **If you had to say out loud what makes a number "even", what would you say?**
+
+(If you're stuck, here's a hint: what operator in Python gives you a remainder?)
+```
+
+**You**:
+```
+remainder when divided by 2 is 0
+```
+
+**AI**:
+```
+Exactly. Now what does that look like as code?
+
+(Hint: `%` for remainder, `==` for equality, `if` to choose — you need all three)
+```
+
+**You**:
+```python
+for i in range(1, 11):
+    if i % 2 == 0:
+        print(i)
+```
+
+**AI**:
+```
+✅ Correct. And you derived it yourself — that sticks far better than being told.
+
+Both questions of this round now pass.
+```
+
+> 💡 **This is the line between "fix it" and "guide it"**:
+> syntax wrong → fixed for you (saves you a round); logic wrong → you must think it through (that *is* the learning).
+
+### Filing + next lesson
+
+**AI**:
+```
+#3 for loops and range() closed ✅
+**Re-assessment**: concept, logic, form all passed.
+This round found 2 issues: 1 fixed directly, 1 you derived yourself.
+
+Updated:
+- 01_学生回答.md → Final re-assessment + Correct answers & analysis
+- 00-学习档案.md → 📊 Mastery table gained "for loops and range()" + 🚦 Handoff Status
+
+---
+
+**Next: #4 while loops and break** (some cases can't be written with for — like "keep reading until the file ends")
+
+### 📖 This lesson's key points
+1. The essential difference between while and for
+2. When you *must* use while
+3. How break / continue work
+4. Avoiding infinite loops
+5. Nested loops
+
+### 📚 Further reading
+- Required: *Python Crash Course* §7.1–7.3 (read before)
+- Self-test source: §7 exercises 7-1 ~ 7-3
+
+### ✅ Your task
+Answer round 1's 2 questions, then say "done".
+
+> ⏳ Review reminder (non-blocking): you've mastered 3 topics — before the next lesson I'll ask 1 synthesis question.
+```
+
+### Day 10 · back after a week away
+
+**You** (new session, different AI tool):
+```
+continue
+```
+
+**AI**:
+```
+I read the 🚦 Handoff Status in 我的学习/00-学习档案.md:
+
+- You're studying **Python** (goal: write scripts that batch-process Excel)
+- Current lesson: **#4 while loops and break**
+- Progress: lesson published, answer document empty, waiting on you
+- Pending: ⏳ Spaced review #1 (the 3-topic trigger has been hit)
+- First step on taking over: do the spaced review, then lesson #4
+
+Shall we do that review question now? (1 question covering variables / data types / for loops)
+```
+
+> 💡 **This is why state is written to disk**: different tool, a week later, and the AI still knows exactly where you are.
+> Because the state lives in **files**, not in the chat.
+
+---
+
+### What this walkthrough demonstrates
+
+| Mechanism | Where it appears |
+|---|---|
+| Requirements → placement → starting level | Day 1 |
+| **Only 1–3 questions per round** | Placement and every lesson |
+| Three-dimension assessment (all questions of the round, one pass) | Lesson 3 |
+| **Small problems fixed directly + three-part explanation** | Problem 2 (syntax) |
+| **Big problems guided, you derive it** | Problem 3 (logic) |
+| Explicitly saying "the questions I didn't change were fine" | "Question 1 was right" |
+| Further reading precise to chapter | Every lesson |
+| Filing (answer doc + three places in the profile) | After each lesson passes |
+| **Switch tools / come back a week later and resume** | Day 10 |
+
+> Want to verify these mechanisms are actually written into the protocol? See
+> [`协议/00_导师协议.en.md`](./协议/00_导师协议.en.md) (three-dimension assessment, direct-fix protocol, 1–3 questions per round)
+> and [`AGENTS.md`](./AGENTS.md) (11 hard rules). **The dialogue is the protocol's output, not decoration.**
 
 ---
 
