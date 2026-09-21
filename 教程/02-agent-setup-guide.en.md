@@ -62,18 +62,20 @@ Now changing the rules means changing only `AGENTS.md`, and the pointer files ar
 
 ### Installation steps
 
-| Step | What to do | Screenshot |
+| Step | What to do | Diagram |
 |---|---|---|
-| 1 | Open `https://www.trae.cn` in your browser | `图片/trae-01-官网.png` |
-| 2 | Click "Download" → choose Windows → download the `.exe` | `图片/trae-02-下载.png` |
-| 3 | Double-click to install, clicking "Next" all the way through | `图片/trae-03-安装.png` |
-| 4 | Open Trae and log in with phone number / WeChat QR code (**no credit card needed**) | `图片/trae-04-登录.png` |
-| 5 | `File → Open Folder` → select the `StepsToGreat` folder | `图片/trae-05-打开文件夹.png` |
-| 6 | **Settings (gear) → Rules → Import settings → turn on "Include AGENTS.md in context"** | `图片/trae-06-开关.png` |
-| 7 | Start a new chat and type "I'm the student. Please read AGENTS.md first, then begin." | `图片/trae-07-对话.png` |
+| 1 | Open `https://www.trae.cn` in your browser, click "Download" | [UI mockups §1](./ui-mockups.en.md#1-download-trae-official-site) |
+| 2 | Choose Windows → download the `.exe` → double-click to install, clicking "Next" all the way through | [§2](./ui-mockups.en.md#2-installation) |
+| 3 | Open Trae and log in with phone number / WeChat QR code (**no credit card needed**) | [§3](./ui-mockups.en.md#3-log-in) |
+| 4 | **`File → Open Folder`** → select the `StepsToGreat` **folder** (not a file!) | [§4](./ui-mockups.en.md#4-open-the-folder-the-easy-step-to-get-wrong) |
+| 5 | **Settings (gear) → Rules → Import settings → turn on "Include AGENTS.md in context"** | [§5](./ui-mockups.en.md#5-flip-the-rules-switch-the-most-critical-step-90-of-people-miss-it) |
+| 6 | Start a new chat and type "I'm the student. Please read AGENTS.md first, then begin." | [§6](./ui-mockups.en.md#6-say-the-first-sentence) |
+| 7 | Ask it to recite the hard rules and confirm it read them (should answer **9**) | [§7](./ui-mockups.en.md#7-verify-it-really-read-them-the-only-reliable-check) |
 
-> ⚠️ **Step 6 is the easiest one to miss.** Trae does not read `AGENTS.md` by default.
-> This project has already placed an `alwaysApply: true` pointer in `.trae/rules/`, so it works even if you forget, but turning it on is recommended.
+> ⚠️ **Steps 4 and 5 are the two easiest to get wrong.** Picking a file in step 4 kills all the rules; skipping step 5 means Trae never reads `AGENTS.md`.
+> This project ships an `alwaysApply: true` pointer in `.trae/rules/`, so step 5 will **probably still work** if you forget — but do it anyway.
+
+> 💡 All UI mockups (plain text + mermaid, no screenshots) → [`ui-mockups.en.md`](./ui-mockups.en.md)
 
 ### Verifying it took effect
 

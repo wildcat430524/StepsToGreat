@@ -51,19 +51,33 @@
 ```bash
 node _tools/setup-agents.mjs   # 重新生成全部跳板文件
 node _tools/check.mjs          # 内容质检（必须全过）
+node _tools/check-mermaid.mjs  # mermaid 图真实渲染校验（缺依赖会自动跳过）
 ```
 
-`check.mjs` 检查：
+或一条命令跑完：
+
+```bash
+npm run verify
+```
+
+### `check.mjs` 检查
 
 | 项 | 说明 |
 |---|---|
 | 围栏奇偶 | ` ``` ` 必须成对 |
 | 坏链接 | 相对链接指向的文件必须存在 |
+| **锚点有效性** | `文件.md#锚点` 的锚点必须在目标文件里真实存在（标题能生成它） |
 | 占位词残留 | 框架文件里不许有 `<填>` `<TODO>` |
 | 编码 | UTF-8 **无 BOM**、无 U+FFFD |
 | 行尾 | **LF**（不是 CRLF） |
+| **图片引用** | 不许引用 `.png/.jpg/...` —— 本项目约定教程用纯文本示意图（见 `docs/adr/0006`） |
 | 跳板一致性 | 跳板文件必须与脚本生成的一致 |
 | 档案路径 | 学习档案里的引用路径必须存在 |
+
+### `check-mermaid.mjs` 检查
+
+用**无头 Chromium 真实渲染**每个 ` ```mermaid ` 块 —— 语法错会在 GitHub 上显示成报错框，
+而纯 Markdown 检查查不出来。缺依赖（playwright-core / chromium）时自动跳过，不算失败。
 
 ---
 
@@ -75,6 +89,7 @@ node _tools/check.mjs          # 内容质检（必须全过）
 | 路径 | 保留中文目录名（`协议/` `学科包/` `我的学习/`），不要翻译 |
 | 术语 | 遵守 [`CONTEXT.md`](./CONTEXT.md) 的词汇表；冲突时以它为准 |
 | 结构 | Markdown 小标题 + 表格优先；emoji 克制（✅⚠️❌📁📖） |
+| **教程配图** | **用纯文本示意图 / mermaid，不用截图** —— 截图会随软件改版过时，且无法 diff |
 | 行尾 | LF |
 | 编码 | UTF-8 无 BOM |
 

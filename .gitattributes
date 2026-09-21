@@ -1,7 +1,8 @@
 # 强制行尾为 LF（项目约定，跨平台一致）
 * text=auto eol=lf
 
-# 明确二进制文件
+# 明确二进制文件（本项目约定教程不用截图，见 docs/adr/0006；
+# 用户若自行放入图片，按二进制处理避免行尾转换损坏）
 *.png binary
 *.jpg binary
 *.jpeg binary

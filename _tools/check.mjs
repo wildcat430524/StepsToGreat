@@ -39,6 +39,9 @@ const PLACEHOLDER_PATTERNS = [
   /lorem ipsum/gi,
 ];
 
+/** 图片引用：本项目约定教程不用截图（见 ADR-0006），出现 .png/.jpg 引用应报错 */
+const IMAGE_REF_RE = /!\[[^\]]*\]\(([^)]+\.(?:png|jpe?g|gif|webp|svg))\)/gi;
+
 /** 框架文件（占位词检查范围） */
 const FRAMEWORK_PREFIXES = ['协议', '学科包', '教程', '_tools'];
 
@@ -95,6 +98,54 @@ function stripCodeFences(text) {
   return out.join('\n');
 }
 
+/**
+ * 按 GitHub 风格把标题文本转成锚点 id。
+ * 规则（近似 GitHub）：小写 → 去掉标点/emoji → 空格转连字符。
+ * 保留中文、字母、数字、连字符、下划线。
+ */
+function slugify(heading) {
+  return heading
+    .trim()
+    .toLowerCase()
+    // 去掉 Markdown 行内标记
+    .replace(/[`*_~[\]()]/g, '')
+    // 去掉 emoji 与符号（保留中文 \u4e00-\u9fff、字母数字、空格、连字符、下划线）
+    .replace(/[^\w\u4e00-\u9fff\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+/** 收集一个 Markdown 文件里所有标题能生成的锚点集合 */
+function collectHeadingAnchors(text) {
+  const anchors = new Set();
+  const lines = text.split('\n');
+  let inFence = false;
+  for (const line of lines) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (inFence) continue;
+    const m = /^(#{1,6})\s+(.+?)\s*$/.exec(line);
+    if (!m) continue;
+    const slug = slugify(m[2]);
+    if (slug) anchors.add(slug);
+  }
+  return anchors;
+}
+
+/** 锚点是否存在（先按 slug 比，再退化为大小写不敏感的原文包含判断） */
+function hasHeadingAnchor(text, anchor) {
+  const target = anchor.toLowerCase();
+  const anchors = collectHeadingAnchors(text);
+  if (anchors.has(target)) return true;
+  // 退化：允许作者手写不完全规范的锚点，只要能对上标题文本
+  for (const a of anchors) {
+    if (a.startsWith(target) || target.startsWith(a)) return true;
+  }
+  return false;
+}
+
 const files = walk(ROOT).filter((f) => extname(f) === '.md' || extname(f) === '.mdc');
 
 for (const abs of files) {
@@ -145,21 +196,55 @@ for (const abs of files) {
     }
   }
 
-  // ── 相对链接存在性 ─────────────────────────────────────────
+  // ── 图片引用（本项目约定：教程不用截图，见 ADR-0006）───────
+  {
+    let im;
+    IMAGE_REF_RE.lastIndex = 0;
+    while ((im = IMAGE_REF_RE.exec(prose)) !== null) {
+      problems.push(
+        `${rp}: 引用了图片 ${im[1]} —— 本项目约定教程用纯文本示意图（见 docs/adr/0006）`,
+      );
+    }
+  }
+
+  // ── 相对链接存在性 + 锚点校验 ───────────────────────────────
   const linkRe = /\[[^\]]*\]\(([^)]+)\)/g;
   let m;
   while ((m = linkRe.exec(prose)) !== null) {
-    let target = m[1].trim();
-    if (!target) continue;
-    if (/^(https?:|mailto:|#|tel:)/i.test(target)) continue;
-    // 去掉锚点与查询
-    target = target.split('#')[0].split('?')[0];
-    if (!target) continue;
-    // 跳过纯锚点
-    if (target.startsWith('#')) continue;
+    const raw = m[1].trim();
+    if (!raw) continue;
+    if (/^(https?:|mailto:|tel:)/i.test(raw)) continue;
+
+    const hashIdx = raw.indexOf('#');
+    const anchor = hashIdx >= 0 ? raw.slice(hashIdx + 1) : '';
+    let target = (hashIdx >= 0 ? raw.slice(0, hashIdx) : raw).split('?')[0];
+    target = target.trim();
+
+    // 纯锚点：跳到本文件的小节
+    if (!target) {
+      if (anchor && !hasHeadingAnchor(text, anchor)) {
+        problems.push(`${rp}: 锚点不存在 → #${anchor}`);
+      }
+      continue;
+    }
+
     const targetAbs = join(dirname(abs), decodeURIComponent(target));
     if (!existsSync(targetAbs)) {
       problems.push(`${rp}: 坏链接 → ${target}`);
+      continue;
+    }
+
+    // 跨文件锚点：校验目标文件的标题能否生成该锚点
+    if (anchor && extname(targetAbs) === '.md') {
+      let targetText;
+      try {
+        targetText = readFileSync(targetAbs, 'utf8');
+      } catch {
+        continue;
+      }
+      if (!hasHeadingAnchor(targetText, anchor)) {
+        problems.push(`${rp}: 锚点在目标文件中不存在 → ${target}#${anchor}`);
+      }
     }
   }
 }

@@ -7,7 +7,8 @@
   "scripts": {
     "setup": "node _tools/setup-agents.mjs",
     "check": "node _tools/check.mjs",
-    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs"
+    "check:mermaid": "node _tools/check-mermaid.mjs",
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/check-mermaid.mjs"
   },
   "keywords": [
     "ai-tutor",

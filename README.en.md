@@ -48,6 +48,7 @@ Recommended: **Trae** (free, Chinese UI, GUI, no API key needed) —
 Alternatives: **ZCode** (Z.ai — reads AGENTS.md natively, zero config), **CodeBuddy** (Tencent), **Qoder** (Alibaba), **Cursor**.
 
 Full comparison → [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md)
+UI mockups (plain text, no screenshots) → [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md)
 
 ### 2. Open the folder
 
@@ -144,7 +145,7 @@ StepsToGreat/
 ├── 学科包/                       ← per-subject assessment criteria
 ├── 模板/                         ← blank templates
 ├── 示例/                         ← 5-minute demo
-├── 教程/                         ← tutorials
+├── 教程/                         ← tutorials (setup / agents / UI mockups / design)
 ├── _tools/                       ← quality check + pointer generator
 ├── docs/                         ← compatibility matrix + ADRs
 ├── 我的学习/                     ← [YOUR DATA] all records live here
