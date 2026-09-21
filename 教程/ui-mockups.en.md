@@ -36,7 +36,7 @@ flowchart LR
     B --> C["3. Flip the rules switch<br/>(required in Trae)"]
     C --> D["4. Say the first sentence<br/>I'm the student, read AGENTS.md"]
     D --> E{"5. Verify<br/>ask it to recite the hard rules"}
-    E -->|"answers 12"| F["✅ Start learning"]
+    E -->|"answers 11"| F["✅ Start learning"]
     E -->|"can't"| B
 ```
 
@@ -253,7 +253,7 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 │  You: Recite the "Hard rules" section of AGENTS.md —          │
 │       how many are there?                                     │
 │                                                               │
-│  AI:  AGENTS.md's "Hard rules" has 12 items:                  │
+│  AI:  AGENTS.md's "Hard rules" has 11 items:                  │
 │       1. When the student says "done" → re-read the answer    │
 │          document before assessing; never judge from memory   │
 │       2. Assess all of **this round's** questions in one      │
@@ -269,14 +269,12 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 │          this round is all ✅                                 │
 │       7. Settle preferences in one go, but practice questions │
 │          go round by round                                    │
-│       8. Every new lesson ships with "📚 Further reading",    │
-│          precise to title and chapter                         │
-│       9. Never teach from parametric memory; every claim      │
-│          must be traceable                                    │
-│      10. Use the Feynman technique as a diagnostic (adaptive  │
+│       8. Never invent content — teaching must be grounded;    │
+│          if unsure, say so                                    │
+│       9. Use the Feynman technique as a diagnostic (adaptive  │
 │          frequency; always once at a major module's end)      │
-│      11. Do not modify 协议/ 模板/ 学科包/ _tools/            │
-│      12. Rule-level requests → write them into 我的规则.md,   │
+│      10. Do not modify 协议/ 模板/ 学科包/ _tools/            │
+│      11. Rule-level requests → write them into 我的规则.md,   │
 │          never edit the framework                             │
 │                                                               │
 │      ✅ I've read the protocol and I'm ready.                 │
@@ -286,7 +284,7 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 
 | Result | Verdict | Next step |
 |---|---|---|
-| Answers **12** | ✅ all good | just say "I want to learn X" |
+| Answers **11** | ✅ all good | just say "I want to learn X" |
 | Can't / says file not found | ❌ rules not active | back to step 4 (did you open the folder?) → step 5 (is the switch on?) |
 | Vague, wrong count | ⚠️ partially active | try another tool, or paste `AGENTS.md` in manually |
 
@@ -326,7 +324,7 @@ sequenceDiagram
         S->>T: my new answer
     end
     T->>F: file the result (🚦 / 📊 / ⏳)
-    T->>S: next lesson + further reading
+    T->>S: next lesson
 ```
 
 ---

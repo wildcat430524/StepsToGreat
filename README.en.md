@@ -81,6 +81,33 @@ flowchart TD
 
 **You only ever say two things**: the opening line, and "**done**".
 
+### Every lesson produces two documents
+
+**This is how the teaching model is carried** — each lesson generates two Markdown files in the folder:
+
+```
+我的学习/学科/Python/03-for循环/
+├── 01_教学引导.md    ← the tutor writes: explanation + examples + questions (laid out by round)
+└── 01_学生回答.md    ← you write: answer in the blank slots; two placeholders at the end for the tutor
+```
+
+| Document | Who writes it | What's inside |
+|---|---|---|
+| **`01_教学引导.md`** | The tutor | Why learn it → core concepts → examples → old vs new → common traps → links to prior knowledge → key points → questions (by round) |
+| **`01_学生回答.md`** | **You** | This round's questions + your answers; **two placeholders at the end**: `## 最终复评结果` (per-question three-dimension table) and `## 正确答案与解析` (three-part explanations) |
+
+**Two key conventions**:
+
+| Convention | What it means |
+|---|---|
+| **The answer document is the only learning evidence** | Mastery is judged **solely by its "Final re-assessment" section** — not by what was said in chat, not by what the AI claimed |
+| **Appended round by round, never all at once** | The answer document starts with **round 1's questions only** (1–3 of them); once that round is all ✅, the tutor **appends** the next round — otherwise you'd see every question up front, which defeats the whole point |
+
+> 💡 **Why two documents instead of one chat**:
+> a chat disappears when you close it; documents stay. Three months later, when you want to review
+> "what did I get wrong about for loops?", open `01_学生回答.md` and you'll see your original answer,
+> why it was wrong, and the fix — **instead of scrolling back through a chat log**.
+
 ---
 
 ## Core mechanics
@@ -278,11 +305,6 @@ Ready to start lesson 1?
 4. When *not* to use for
 5. The infinite-loop trap
 
-### 📚 Further reading
-- Required: *Python Crash Course* §4.1–4.3 (read before)
-- Optional: official docs, "for Statements" (reference after)
-- Self-test source: §4 exercises 4-3 ~ 4-5
-
 ### ✅ Your task
 Read the guide, answer **round 1's 2 questions** in the answer document, then say "done".
 ```
@@ -415,10 +437,6 @@ Updated:
 4. Avoiding infinite loops
 5. Nested loops
 
-### 📚 Further reading
-- Required: *Python Crash Course* §7.1–7.3 (read before)
-- Self-test source: §7 exercises 7-1 ~ 7-3
-
 ### ✅ Your task
 Answer round 1's 2 questions, then say "done".
 
@@ -506,13 +524,13 @@ Shall we do that review question now? (1 question covering variables / data type
 | **Big problems guided, you derive it** | Problem 3 (logic) |
 | **Feynman question (end of a major module, only 1 question)** | Day 7 |
 | Explicitly saying "the questions I didn't change were fine" | "Question 1 was right" |
-| Further reading precise to chapter | Every lesson |
+| Two documents per lesson (teaching + answer) | Every lesson |
 | Filing (answer doc + three places in the profile) | After each lesson passes |
 | **Switch tools / come back a week later and resume** | Day 10 |
 
 > Want to verify these mechanisms are actually written into the protocol? See
 > [`协议/00_导师协议.en.md`](./协议/00_导师协议.en.md) (three-dimension assessment, direct-fix protocol, 1–3 questions per round, Feynman technique)
-> and [`AGENTS.md`](./AGENTS.md) (12 hard rules). **The dialogue is the protocol's output, not decoration.**
+> and [`AGENTS.md`](./AGENTS.md) (11 hard rules). **The dialogue is the protocol's output, not decoration.**
 
 ---
 
@@ -670,7 +688,7 @@ StepsToGreat/
 ├── 示例/                         ← 5-minute demo of the whole loop
 ├── 教程/                         ← setup / per-tool guides / UI mockups / design notes
 ├── _tools/                       ← pointer generator + content checks
-├── docs/                         ← compatibility matrix + 8 ADRs
+├── docs/                         ← compatibility matrix + 9 ADRs
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
 │   ├── 00-学习档案.md            ← overall progress state
 │   └── 我的规则.md               ← [YOUR RULES] highest priority, edit freely
@@ -708,7 +726,7 @@ Yes. One directory per subject under `我的学习/学科/<subject>/`, with `00-
 The protocol itself is fully offline. The *tutor* is an AI, so it needs a model — run a local one (Ollama) and nothing ever leaves your machine.
 
 **How do I contribute a subject pack?**
-Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 6 parts. **Most needed: music, fitness, drawing, writing, software operation.**
+Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 7 parts. **Most needed: music, fitness, drawing, writing, software operation.**
 
 ---
 
@@ -720,7 +738,7 @@ Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包�
 | Per-tool setup | [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md) |
 | What the UI looks like | [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md) |
 | **Why it's designed this way** | [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) |
-| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (8 ADRs) |
+| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (9 ADRs) |
 | Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
 | Glossary | [`CONTEXT.md`](./CONTEXT.md) |
 | Change the rules | [`我的学习/我的规则.md`](./我的学习/我的规则.md) |

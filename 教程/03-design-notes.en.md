@@ -78,7 +78,11 @@ Hence `学科包/` — this turns that from a Java-only rule into something univ
 | The filing event table (event → which file to write) | The old project's section 7 |
 | State maintained in only three places (🚦/📊/⏳) | A lesson from the old project's anti-patterns |
 | "After a change you must re-read the file" | The old project's hard rule 1 |
-| Further reading precise to the chapter | The old project's route document's final section |
+
+> ⚠️ **One decision reversed**: the old project demanded "further reading precise to title and chapter";
+> this project **dropped that mechanism**. Reason: a book title and chapter number recalled from memory
+> **can't be verified**, and the student probably doesn't own that book — which directly contradicts
+> this project's own rule against inventing content. See [`docs/adr/0009`](../docs/adr/0009-drop-further-reading.md).
 
 ### Improvements (new in this project)
 
@@ -136,7 +140,7 @@ StepsToGreat/
 ### Add a subject pack (the most valuable)
 
 1. Copy `学科包/_自定义学科包模板.md`
-2. Fill in the 6 sections (three-dimension definitions, criteria, high-frequency errors, question forms, verification methods, how to write further reading)
+2. Fill in the 7 sections (three-dimension definitions, criteria, high-frequency errors, question forms, verification methods, Feynman usage, how to cite the student's own material)
 3. Save it as `学科包/<subject-name>.md`
 4. Open a PR
 
