@@ -1,6 +1,6 @@
-# StepsToGreat
+# Steps2Great
 
-[![Content check](https://github.com/wildcat430524/StepsToGreat/actions/workflows/check.yml/badge.svg)](https://github.com/wildcat430524/StepsToGreat/actions/workflows/check.yml)
+[![Content check](https://github.com/wildcat430524/Steps2Great/actions/workflows/check.yml/badge.svg)](https://github.com/wildcat430524/Steps2Great/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](./LICENSE)
 [![Docs: CC BY 4.0](https://img.shields.io/badge/docs-CC%20BY%204.0-lightgrey.svg)](./LICENSE-DOCS)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
@@ -21,7 +21,7 @@ then records your progress so you can pick up where you left off.
 
 AI is already good enough to teach. **What was always missing isn't content — it's someone watching you.**
 
-| Your current situation | How StepsToGreat fixes it |
+| Your current situation | How Steps2Great fixes it |
 |---|---|
 | You ask an AI "how do I learn Python?" — it hands you a roadmap, and then… nothing | The AI runs a placement test → finds your real level → plans the route → **ships lesson 1** |
 | You finish a lesson; nobody checks whether you actually got it | Three-dimension assessment: **all ✅ before you may advance** |
@@ -31,7 +31,7 @@ AI is already good enough to teach. **What was always missing isn't content — 
 
 ### Versus just asking an AI
 
-| | Just asking an AI | StepsToGreat |
+| | Just asking an AI | Steps2Great |
 |---|---|---|
 | Persona | You re-explain "you're my teacher" every time | ✅ Baked into `AGENTS.md` — zero cost |
 | Remembers your progress | ❌ Context only; gone when closed | ✅ Written to `我的学习/00-学习档案.md` |
@@ -593,7 +593,7 @@ Shall we do that review question now? (1 question covering variables / data type
 
   Alternatives: **ZCode** (Z.ai — reads `AGENTS.md` natively, zero config), **CodeBuddy** (Tencent), **Qoder** (Alibaba), **Cursor**
 
-- [ ] **2. Open the folder** — `File → Open Folder` → select `StepsToGreat`
+- [ ] **2. Open the folder** — `File → Open Folder` → select `Steps2Great`
 
   > ⚠️ Open the **folder itself**, not a file inside it. Get this wrong and the AI can't read the rules — everything downstream fails.
 
@@ -717,7 +717,7 @@ Change a rule in exactly one place (`AGENTS.md`); the other 25 pointer files are
 ## Layout
 
 ```
-StepsToGreat/
+Steps2Great/
 ├── AGENTS.md                    ← the single contract (AI starts here)
 ├── AGENTS.en.md                 ← English version
 ├── CONTEXT.md                   ← glossary (keeps terms from blurring)

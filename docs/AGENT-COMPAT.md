@@ -48,7 +48,7 @@ node _tools/setup-agents.mjs --check  # 只检查是否齐全（CI 用）
 
 ```js
 {
-  path: '.newtool/rules/00-steps-to-great.md',
+  path: '.newtool/rules/00-steps2great.md',
   body: pointer('NewTool'),
 }
 ```

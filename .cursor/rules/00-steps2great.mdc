@@ -1,5 +1,5 @@
 ---
-description: StepsToGreat 导师协议 —— 项目唯一契约入口
+description: Steps2Great 导师协议 —— 项目唯一契约入口
 alwaysApply: true
 ---
 

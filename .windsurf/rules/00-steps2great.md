@@ -1,6 +1,6 @@
 ---
 trigger: always_on
-description: StepsToGreat 导师协议入口
+description: Steps2Great 导师协议入口
 ---
 
 # Windsurf / Devin · 请先读 AGENTS.md

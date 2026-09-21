@@ -32,7 +32,7 @@ or search the same keyword in the official docs. **Don't assume the step is wron
 
 ```mermaid
 flowchart LR
-    A["1. Install a tool<br/>Trae / ZCode"] --> B["2. Open the folder<br/>select StepsToGreat"]
+    A["1. Install a tool<br/>Trae / ZCode"] --> B["2. Open the folder<br/>select Steps2Great"]
     B --> C["3. Flip the rules switch<br/>(required in Trae)"]
     C --> D["4. Say the first sentence<br/>I'm the student, read AGENTS.md"]
     D --> E{"5. Verify<br/>ask it to recite the hard rules"}
@@ -136,7 +136,7 @@ flowchart LR
 └──────────────────────────────────────────────────────────────┘
 ```
 
-**What to do**: `File → Open Folder` → in the dialog, select the **whole `StepsToGreat` folder**.
+**What to do**: `File → Open Folder` → in the dialog, select the **whole `Steps2Great` folder**.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -145,7 +145,7 @@ flowchart LR
 │  This PC  ▾  E:  ▾                                           │
 │                                                              │
 │  📁 AITutorKit      📁 playground                            │
-│  📁 StepsToGreat  ←──── 【select this folder, then "Select Folder"】│
+│  📁 Steps2Great  ←──── 【select this folder, then "Select Folder"】│
 │  📁 other projects                                           │
 │                                                              │
 │                              [ Select Folder ]               │
@@ -163,7 +163,7 @@ After a successful open, the file tree on the left should look like this:
 ┌───────────────────────────────┐
 │ Explorer                      │
 ├───────────────────────────────┤
-│ ▾ 📁 STEPSTOGREAT             │
+│ ▾ 📁 STEPS2GREAT              │
 │   📄 AGENTS.md  ← you need this│
 │   📁 协议/                     │
 │   📁 学科包/                   │
@@ -225,7 +225,7 @@ Settings (gear ⚙, bottom-left) → Rules → Import settings → turn on "Incl
 │  Trae                                              ─  □  ✕   │
 ├────────────────────┬─────────────────────────────────────────┤
 │ Explorer           │  New chat                            ⋯  │
-│ ▾ 📁 STEPSTOGREAT  │                                         │
+│ ▾ 📁 STEPS2GREAT   │                                         │
 │   📄 AGENTS.md     │  ┌───────────────────────────────────┐  │
 │   📁 协议/         │  │ I'm the student. Please read      │  │
 │   📁 学科包/       │  │ AGENTS.md first, then begin.      │  │
@@ -336,7 +336,7 @@ flowchart TD
     P["AI says it can't read AGENTS.md"] --> Q1{"Did you open a<br/>folder or a file?"}
     Q1 -->|"a single .md file"| A1["❌ start over: File → Open Folder"]
     Q1 -->|"a folder"| Q2{"Does the sidebar<br/>show AGENTS.md?"}
-    Q2 -->|"no"| A2["❌ wrong folder; reselect StepsToGreat"]
+    Q2 -->|"no"| A2["❌ wrong folder; reselect Steps2Great"]
     Q2 -->|"yes"| Q3{"Are you using Trae?"}
     Q3 -->|"yes"| A3["check Settings > Rules > Import settings<br/>is that switch on?"]
     Q3 -->|"no"| A4["try another tool<br/>(ZCode / Cursor are zero-config)"]

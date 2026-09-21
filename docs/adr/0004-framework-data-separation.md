@@ -29,7 +29,7 @@
 **采用方案 3。**
 
 ```
-StepsToGreat/                    ← 框架（git 跟踪）
+Steps2Great/                    ← 框架（git 跟踪）
 ├── AGENTS.md / 协议/ / 学科包/ / 模板/ / 教程/ / _tools/ / docs/
 ├── 我的学习/                     ← 数据（.gitignore，除起始档案与 README）
 └── 资料/                         ← 数据（.gitignore，除 README）

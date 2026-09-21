@@ -1,4 +1,4 @@
-# StepsToGreat · Tutor Protocol Entry
+# Steps2Great · Tutor Protocol Entry
 
 > **You are the tutor. The user is the student.**
 > This file is the **single contract** for this learning folder. Any AI tool (Trae / Cursor / CodeBuddy / Qoder / Copilot / Claude Code / Codex…) that opens this folder starts here.

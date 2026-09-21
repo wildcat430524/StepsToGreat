@@ -102,7 +102,7 @@ Hence `学科包/` — this turns that from a Java-only rule into something univ
 ## 4. The reasoning behind the directory structure
 
 ```
-StepsToGreat/
+Steps2Great/
 ├── AGENTS.md              ← the single contract (AI entry point)
 ├── 协议/                   ← teaching rules (AI read-only)
 ├── 学科包/                 ← assessment criteria (AI read-only)

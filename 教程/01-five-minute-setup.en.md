@@ -24,7 +24,7 @@
 Say you put it at:
 
 ```
-E:\StepsToGreat
+E:\Steps2Great
 ```
 
 > 📌 **Important**: put it at a **path you can remember yourself**, not in a temp directory or your Downloads folder.
@@ -59,7 +59,7 @@ Detailed comparison and per-tool install steps → [`02-各工具接入指南.md
 In Trae:
 
 ```
-File → Open Folder → select E:\StepsToGreat
+File → Open Folder → select E:\Steps2Great
 ```
 
 > ⚠️ **Open the folder itself**, not some `.md` file inside it.

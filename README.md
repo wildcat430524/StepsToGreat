@@ -1,6 +1,6 @@
-# StepsToGreat
+# Steps2Great
 
-[![内容质检](https://github.com/wildcat430524/StepsToGreat/actions/workflows/check.yml/badge.svg)](https://github.com/wildcat430524/StepsToGreat/actions/workflows/check.yml)
+[![内容质检](https://github.com/wildcat430524/Steps2Great/actions/workflows/check.yml/badge.svg)](https://github.com/wildcat430524/Steps2Great/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/代码-MIT-blue.svg)](./LICENSE)
 [![Docs: CC BY 4.0](https://img.shields.io/badge/文档-CC%20BY%204.0-lightgrey.svg)](./LICENSE-DOCS)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
@@ -20,7 +20,7 @@
 
 AI 已经足够会教。**缺的从来不是内容，是那个盯着你的人。**
 
-| 你现在的处境 | StepsToGreat 怎么解决 |
+| 你现在的处境 | Steps2Great 怎么解决 |
 |---|---|
 | 问 AI「我该怎么学 Python」，它给你一份路线图，然后就没有然后了 | AI 出摸底测试 → 定你的真实起点 → 排路线 → **发第一课** |
 | 学完一课，没人检查你到底会不会 | 三维评估，**全 ✅ 才允许推进下一课** |
@@ -30,7 +30,7 @@ AI 已经足够会教。**缺的从来不是内容，是那个盯着你的人。
 
 ### 和「直接问 AI」的区别
 
-| | 直接问 AI | StepsToGreat |
+| | 直接问 AI | Steps2Great |
 |---|---|---|
 | 有人格设定 | 每次要重新解释「你是我的老师」 | ✅ 写死在 `AGENTS.md`，零成本 |
 | 记得你学到哪 | ❌ 靠上下文，关了就忘 | ✅ 落盘在 `我的学习/00-学习档案.md` |
@@ -585,7 +585,7 @@ for i in range(1, 11):
 
   其它可选：**ZCode**（智谱，原生认 `AGENTS.md`，零配置）、**CodeBuddy**（腾讯）、**Qoder**（阿里）、**Cursor**
 
-- [ ] **2. 打开文件夹** —— `文件 → 打开文件夹` → 选中 `StepsToGreat`
+- [ ] **2. 打开文件夹** —— `文件 → 打开文件夹` → 选中 `Steps2Great`
 
   > ⚠️ 打开的是**文件夹本身**，不是里面的某个文件。选错这一步，AI 读不到规则，后面全部无效。
 
@@ -708,7 +708,7 @@ for i in range(1, 11):
 ## 目录结构
 
 ```
-StepsToGreat/
+Steps2Great/
 ├── AGENTS.md                    ← 唯一契约（AI 从这里开始）
 ├── AGENTS.en.md                 ← 英文版
 ├── CONTEXT.md                   ← 术语表（避免概念混用）
