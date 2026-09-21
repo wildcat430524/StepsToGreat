@@ -315,17 +315,25 @@ if (existsSync(profile)) {
     }
   }
 
-  // 跳板文件数量
-  const pointerClaim = /(\d+)\s*个跳板文件/g;
-  for (const f of ['README.md', 'README.en.md', 'AGENTS.md', '协议/00_导师协议.md']) {
-    const abs = join(ROOT, f);
-    if (!existsSync(abs)) continue;
-    const text = readFileSync(abs, 'utf8');
-    let pm;
-    while ((pm = pointerClaim.exec(text)) !== null) {
-      const claimed = Number(pm[1]);
-      if (claimed !== 25) {
-        problems.push(`${f}: 文档写「${claimed} 个跳板文件」，实际是 25 个 —— 请同步`);
+  // 跳板文件数量：以 setup-agents.mjs 实际生成的为准（动态统计，不再硬编码）
+  {
+    // 从脚本里数 TARGETS 数组中「有 path 且无 skip 标记」的条目
+    const setupSrc = readFileSync(join(ROOT, '_tools', 'setup-agents.mjs'), 'utf8');
+    const targetsBlock = setupSrc.split('const TARGETS = [')[1]?.split(/\n\];/)[0] ?? '';
+    const pointerCount = (targetsBlock.match(/^\s*\{\s*$/gm) || []).length
+      - (targetsBlock.match(/skip:\s*true/g) || []).length;
+
+    const pointerClaim = /(\d+)\s*个跳板文件/g;
+    for (const f of ['README.md', 'README.en.md', 'AGENTS.md', '协议/00_导师协议.md']) {
+      const abs = join(ROOT, f);
+      if (!existsSync(abs)) continue;
+      const text = readFileSync(abs, 'utf8');
+      let pm;
+      while ((pm = pointerClaim.exec(text)) !== null) {
+        const claimed = Number(pm[1]);
+        if (claimed !== pointerCount) {
+          problems.push(`${f}: 文档写「${claimed} 个跳板文件」，实际脚本生成 ${pointerCount} 个 —— 请同步（或运行 node _tools/setup-agents.mjs）`);
+        }
       }
     }
   }
