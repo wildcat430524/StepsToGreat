@@ -721,12 +721,13 @@ Steps2Great/
 ├── AGENTS.md                    ← the single contract (AI starts here)
 ├── AGENTS.en.md                 ← English version
 ├── CONTEXT.md                   ← glossary (keeps terms from blurring)
-├── 协议/                         ← teaching rules: 3-dimension assessment / direct-fix / placement / filing
+├── 协议/                         ← teaching rules: 3-dimension assessment / direct-fix / placement / filing / **state machine**
 ├── 学科包/                       ← per-subject assessment criteria
 ├── 模板/                         ← blank templates
 ├── 示例/                         ← 5-minute demo of the whole loop
 ├── 教程/                         ← setup / per-tool guides / UI mockups / design notes
-├── _tools/                       ← pointer generator + content checks
+├── _tools/                       ← pointer generator + content checks + **state validation**
+├── tests/fixtures/               ← regression fixtures for state validation (deliberately broken profiles)
 ├── docs/                         ← compatibility matrix + 9 ADRs
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
 │   ├── 00-学习档案.md            ← overall progress state

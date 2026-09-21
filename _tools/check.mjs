@@ -19,7 +19,7 @@
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, relative, extname, sep } from 'node:path';
+import { join, dirname, relative, extname, sep, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
@@ -30,6 +30,11 @@ const QUIET = process.argv.includes('--quiet');
 const SKIP_DIRS = new Set([
   'node_modules', '.git', '资料', '.obsidian', 'dist', 'build', '.cache',
 ]);
+
+/** 不检查的相对路径前缀 —— 测试夹具是**故意写坏**的数据（路径不存在、状态自相矛盾），
+ *  用内容质检去查它们等于让测试用例自己违反规则。它们的正确性由
+ *  `validate-state.mjs --fixtures` 按 expected.json 断言。 */
+const SKIP_REL_PREFIXES = ['tests/fixtures'];
 
 /** 占位词：只保留「真的没写完」的标记；<课名>/<学科名> 是模板示意，不算 */
 const PLACEHOLDER_PATTERNS = [
@@ -49,6 +54,20 @@ const FRAMEWORK_PREFIXES = ['协议', '学科包', '教程', '_tools'];
 
 /** 本身就是模板、允许保留占位词的文件/目录 */
 const TEMPLATE_EXEMPT = ['模板/', '学科包/_自定义学科包模板.md'];
+
+/**
+ * 模板里的相对链接是**按「模板被复制到哪」写的**，不是按 `模板/` 目录本身写的。
+ * 例：`模板/摸底测试模板.md` 的目标位置是 `我的学习/学科/<学科>/00-摸底测试.md`（3 层深），
+ * 所以它写 `../../../协议/01_摸底剧本.md` —— 在 `模板/` 里当然点不开，但复制过去就对了。
+ * 校验时用这个「虚拟目标目录」当基准，才能查链接是否真的正确。
+ * 未列出的模板（教学引导/学生回答）嵌在 ```markdown 代码块里，本来就不参与链接校验。
+ */
+const TEMPLATE_VIRTUAL_BASE = {
+  '摸底测试模板.md': '我的学习/学科/<学科>',
+  '课程路线模板.md': '我的学习/学科/<学科>',
+  '学习档案模板.md': '我的学习',
+  '学生回答模板.md': '我的学习/学科/<学科>/NN-<课名>',
+};
 
 const problems = [];
 const warnings = [];
@@ -148,7 +167,12 @@ function hasHeadingAnchor(text, anchor) {
   return false;
 }
 
-const files = walk(ROOT).filter((f) => extname(f) === '.md' || extname(f) === '.mdc');
+const files = walk(ROOT)
+  .filter((f) => extname(f) === '.md' || extname(f) === '.mdc')
+  .filter((f) => {
+    const rp = rel(f);
+    return !SKIP_REL_PREFIXES.some((p) => rp === p || rp.startsWith(p + '/'));
+  });
 
 for (const abs of files) {
   const rp = rel(abs);
@@ -233,7 +257,13 @@ for (const abs of files) {
       continue;
     }
 
-    const targetAbs = join(dirname(abs), decodeURIComponent(target));
+    // 模板文件：按「复制到目标位置后」的视角解析（见 TEMPLATE_VIRTUAL_BASE）
+    const virtualBase = rp.startsWith('模板/')
+      ? TEMPLATE_VIRTUAL_BASE[basename(rp)]
+      : undefined;
+    const linkBase = virtualBase ? join(ROOT, virtualBase) : dirname(abs);
+
+    const targetAbs = join(linkBase, decodeURIComponent(target));
     if (!existsSync(targetAbs)) {
       problems.push(`${rp}: 坏链接 → ${target}`);
       continue;

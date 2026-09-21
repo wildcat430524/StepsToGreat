@@ -1,0 +1,5 @@
+{
+  "status": "FAILED",
+  "invariants": ["I3"],
+  "description": "🚦 的「回答文档」指向不存在的目录 —— 接手时找不到文件必须报错"
+}

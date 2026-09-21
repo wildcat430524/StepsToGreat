@@ -49,9 +49,11 @@
 ## 提交前必做
 
 ```bash
-node _tools/setup-agents.mjs   # 重新生成全部跳板文件
-node _tools/check.mjs          # 内容质检（必须全过）
-node _tools/check-mermaid.mjs  # mermaid 图真实渲染校验（缺依赖会自动跳过）
+node _tools/setup-agents.mjs                # 重新生成全部跳板文件
+node _tools/check.mjs                       # 内容质检（必须全过）
+node _tools/validate-state.mjs              # 学习状态校验（不变式 I1–I10）
+node _tools/validate-state.mjs --fixtures tests/fixtures   # 状态校验的回归测试集
+node _tools/check-mermaid.mjs               # mermaid 图真实渲染校验（缺依赖会自动跳过）
 ```
 
 或一条命令跑完：
@@ -73,6 +75,23 @@ npm run verify
 | **图片引用** | 不许引用 `.png/.jpg/...` —— 本项目约定教程用纯文本示意图（见 `docs/adr/0006`） |
 | 跳板一致性 | 跳板文件必须与脚本生成的一致 |
 | 档案路径 | 学习档案里的引用路径必须存在 |
+
+### `validate-state.mjs` 检查
+
+查 `我的学习/00-学习档案.md` 的三处状态（🚦/📊/⏳）是否**自洽、有证据、没提前推进** ——
+判定口径是 [`协议/04_状态机.md`](./协议/04_状态机.md) 第 4 节的 10 条不变式。
+它**只读**，绝不写文件。
+
+| 编号 | 查什么 |
+|---|---|
+| I1 / I2 | 五个区块齐全；空模板识别为 `NEW` 并跳过 |
+| I3 / I4 / I5 | 🚦、📚 索引、⏳ 证据入口的路径必须真实存在 |
+| **I6 / I7 / I8** | **标 ✅ 已掌握必须真有复评证据**（且复评表适用维度全 ✅、评估日期真实） |
+| I9 | 不许提前推进（上一课未掌握就进入下一课） |
+| I10 | ⏳ 待办表不得重复「当前正在上的课」 |
+
+`tests/fixtures/` 是它的回归测试集：6 个**故意写坏**的档案，各带 `expected.json` 断言命中哪条不变式。
+加新用例见 [`tests/README.md`](./tests/README.md)。
 
 ### `check-mermaid.mjs` 检查
 

@@ -1,0 +1,5 @@
+{
+  "status": "FAILED",
+  "invariants": ["I7"],
+  "description": "档案标 ✅ 已掌握，但复评表里逻辑维度是 ⚠️ —— 状态自相矛盾必须报错"
+}

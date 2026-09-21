@@ -8,7 +8,9 @@
     "setup": "node _tools/setup-agents.mjs",
     "check": "node _tools/check.mjs",
     "check:mermaid": "node _tools/check-mermaid.mjs",
-    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/check-mermaid.mjs"
+    "check:state": "node _tools/validate-state.mjs",
+    "test:state": "node _tools/validate-state.mjs --fixtures tests/fixtures",
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs"
   },
   "keywords": [
     "ai-tutor",

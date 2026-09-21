@@ -146,7 +146,7 @@ Every round of the lesson is ✅ → file per the event table → publish the ne
 | Path | Purpose | May you edit it? |
 |---|---|---|
 | `AGENTS.md` | This file, the single contract | ❌ |
-| `协议/` | Teaching rules, placement script, lesson template, filing event table | ❌ |
+| `协议/` | Teaching rules, placement script, lesson template, filing event table, **state machine** (validation criteria) | ❌ |
 | `学科包/` | Per-subject assessment dimension definitions | ❌ |
 | `模板/` | Blank templates for student profile, course route, etc. | ❌ |
 | `示例/` | A 5-minute mini demo of the full loop | ❌ |
