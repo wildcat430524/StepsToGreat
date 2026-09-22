@@ -67,7 +67,7 @@ Now changing the rules means changing only `AGENTS.md`, and the pointer files ar
 | 1 | Open `https://www.trae.cn` in your browser, click "Download" | [UI mockups §1](./ui-mockups.en.md#1-download-trae-official-site) |
 | 2 | Choose Windows → download the `.exe` → double-click to install, clicking "Next" all the way through | [§2](./ui-mockups.en.md#2-installation) |
 | 3 | Open Trae and log in with phone number / WeChat QR code (**no credit card needed**) | [§3](./ui-mockups.en.md#3-log-in) |
-| 4 | **`File → Open Folder`** → select the `Steps2Great` **folder** (not a file!) | [§4](./ui-mockups.en.md#4-open-the-folder-the-easy-step-to-get-wrong) |
+| 4 | **`File → Open Folder`** → select the `StepsToGreat` **folder** (not a file!) | [§4](./ui-mockups.en.md#4-open-the-folder-the-easy-step-to-get-wrong) |
 | 5 | **Settings (gear) → Rules → Import settings → turn on "Include AGENTS.md in context"** | [§5](./ui-mockups.en.md#5-flip-the-rules-switch-the-most-critical-step-90-of-people-miss-it) |
 | 6 | Start a new chat and type "I'm the student. Please read AGENTS.md first, then begin." | [§6](./ui-mockups.en.md#6-say-the-first-sentence) |
 | 7 | Ask it to recite the hard rules and confirm it read them (should answer **9**) | [§7](./ui-mockups.en.md#7-verify-it-really-read-them-the-only-reliable-check) |
@@ -117,7 +117,7 @@ The correct answer is **9**. Can't answer → go back to steps 5 and 6.
 1. Official site `https://zcode.z.ai/` → download now → Windows x64 `.exe`
 2. Double-click to install (add a whitelist entry if the firewall / antivirus blocks it)
 3. First launch → log in via "Connect to use" at the bottom-left (connect Z.ai or BigModel, or enter an API key)
-4. `Open Folder` → select `Steps2Great`
+4. `Open Folder` → select `StepsToGreat`
 5. **The rules take effect automatically**, no settings needed
 6. Verify: start a new session and have it restate the hard rules
 
@@ -139,7 +139,7 @@ The correct answer is **9**. Can't answer → go back to steps 5 and 6.
 |---|---|
 | Files it recognises | `.cursor/rules/*.mdc` (already generated) + `AGENTS.md` (zero configuration) |
 | Free | Hobby tier, **no credit card needed**; the vendor only describes the quota as "Limited Agent requests" |
-| Setup | Download → install → `Open Folder` → select `Steps2Great` → usable immediately |
+| Setup | Download → install → `Open Folder` → select `StepsToGreat` → usable immediately |
 
 ### Tencent CodeBuddy / WorkBuddy
 
@@ -236,7 +236,7 @@ If your tool isn't in the table:
 
 ```js
 {
-  path: '.newtool/rules/00-steps2great.md',
+  path: '.newtool/rules/00-steps-to-great.md',
   body: pointer('NewTool'),
 }
 ```

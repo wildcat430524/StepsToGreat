@@ -126,9 +126,9 @@ const TARGETS = [
 
   // ── Cursor ───────────────────────────────────────────────────
   {
-    path: '.cursor/rules/00-steps2great.mdc',
+    path: '.cursor/rules/00-steps-to-great.mdc',
     body: `---
-description: Steps2Great 导师协议 —— 项目唯一契约入口
+description: StepsToGreat 导师协议 —— 项目唯一契约入口
 alwaysApply: true
 ---
 
@@ -137,9 +137,9 @@ ${pointer('Cursor')}`,
 
   // ── Trae ─────────────────────────────────────────────────────
   {
-    path: '.trae/rules/00-steps2great.md',
+    path: '.trae/rules/00-steps-to-great.md',
     body: `---
-description: Steps2Great 导师协议 —— 项目唯一契约入口
+description: StepsToGreat 导师协议 —— 项目唯一契约入口
 alwaysApply: true
 ---
 
@@ -163,10 +163,10 @@ ${pointer('Trae', `
 
   // ── Windsurf / Devin ─────────────────────────────────────────
   {
-    path: '.windsurf/rules/00-steps2great.md',
+    path: '.windsurf/rules/00-steps-to-great.md',
     body: `---
 trigger: always_on
-description: Steps2Great 导师协议入口
+description: StepsToGreat 导师协议入口
 ---
 
 ${pointer('Windsurf / Devin')}`,
@@ -174,7 +174,7 @@ ${pointer('Windsurf / Devin')}`,
 
   // ── Kiro ─────────────────────────────────────────────────────
   {
-    path: '.kiro/steering/00-steps2great.md',
+    path: '.kiro/steering/00-steps-to-great.md',
     body: `---
 inclusion: always
 ---
@@ -184,7 +184,7 @@ ${pointer('Kiro')}`,
 
   // ── Continue ─────────────────────────────────────────────────
   {
-    path: '.continue/rules/00-steps2great.md',
+    path: '.continue/rules/00-steps-to-great.md',
     body: pointer('Continue', `
 > **Continue 注意**：Continue 官方通篇未提 \`AGENTS.md\`，只认 \`.continue/rules/\`。
 > 所以这个文件对它是**唯一入口**，请务必读完再去读 \`AGENTS.md\`。
@@ -193,19 +193,19 @@ ${pointer('Kiro')}`,
 
   // ── Cline ────────────────────────────────────────────────────
   {
-    path: '.clinerules/00-steps2great.md',
+    path: '.clinerules/00-steps-to-great.md',
     body: pointer('Cline'),
   },
 
   // ── Roo Code ─────────────────────────────────────────────────
   {
-    path: '.roo/rules/00-steps2great.md',
+    path: '.roo/rules/00-steps-to-great.md',
     body: pointer('Roo Code'),
   },
 
   // ── Kilo Code ────────────────────────────────────────────────
   {
-    path: '.kilocode/rules/00-steps2great.md',
+    path: '.kilocode/rules/00-steps-to-great.md',
     body: pointer('Kilo Code', `
 > **Kilo Code 注意**：官方明示 Auto Free 免费通道会记录 prompt/output，
 > 「不要提交个人或机密数据」。本项目的学习资料属个人内容，请提示学生注意。
@@ -214,7 +214,7 @@ ${pointer('Kiro')}`,
 
   // ── Qoder（阿里） ─────────────────────────────────────────────
   {
-    path: '.qoder/rules/00-steps2great.md',
+    path: '.qoder/rules/00-steps-to-great.md',
     body: pointer('Qoder', `
 > **Qoder 注意**：Qoder 原生兼容 \`AGENTS.md\`（零配置）。
 > 本文件是冗余保险 —— 当学生在设置里禁用了 \`AGENTS.md\` 读取时兜底。
@@ -223,7 +223,7 @@ ${pointer('Kiro')}`,
 
   // ── Google Antigravity ───────────────────────────────────────
   {
-    path: '.agents/rules/00-steps2great.md',
+    path: '.agents/rules/00-steps-to-great.md',
     body: pointer('Antigravity'),
   },
 
@@ -235,19 +235,19 @@ ${pointer('Kiro')}`,
 
   // ── JetBrains AI Assistant ───────────────────────────────────
   {
-    path: '.aiassistant/rules/00-steps2great.md',
+    path: '.aiassistant/rules/00-steps-to-great.md',
     body: pointer('JetBrains AI Assistant'),
   },
 
   // ── Amazon Q Developer ───────────────────────────────────────
   {
-    path: '.amazonq/rules/00-steps2great.md',
+    path: '.amazonq/rules/00-steps-to-great.md',
     body: pointer('Amazon Q Developer'),
   },
 
   // ── Augment ──────────────────────────────────────────────────
   {
-    path: '.augment/rules/00-steps2great.md',
+    path: '.augment/rules/00-steps-to-great.md',
     body: pointer('Augment'),
   },
 
@@ -330,7 +330,7 @@ node _tools/setup-agents.mjs --check  # 只检查是否齐全（CI 用）
 
 \`\`\`js
 {
-  path: '.newtool/rules/00-steps2great.md',
+  path: '.newtool/rules/00-steps-to-great.md',
   body: pointer('NewTool'),
 }
 \`\`\`

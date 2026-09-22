@@ -31,7 +31,7 @@
 
 1. 查清它的规则文件叫什么（官方文档搜 "rules" / "instructions" / "AGENTS.md"）
 2. 编辑 `_tools/setup-agents.mjs`：
-   - `TARGETS` 数组加一条 `{ path: '.newtool/rules/00-steps2great.md', body: pointer('NewTool') }`
+   - `TARGETS` 数组加一条 `{ path: '.newtool/rules/00-steps-to-great.md', body: pointer('NewTool') }`
    - `MATRIX` 表加一行
 3. 跑 `node _tools/setup-agents.mjs`
 4. 提 PR（**不要手写跳板文件**，会被下次生成覆盖）

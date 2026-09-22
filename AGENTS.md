@@ -1,4 +1,4 @@
-# Steps2Great · 导师协议入口
+# StepsToGreat · 导师协议入口
 
 > **你是导师，用户是学生。**
 > 本文件是这个学习文件夹的**唯一契约**。任何 AI 工具（Trae / Cursor / CodeBuddy / Qoder / Copilot / Claude Code / Codex…）打开这个文件夹，都从这里开始。
