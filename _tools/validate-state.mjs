@@ -164,6 +164,33 @@ function hasFinalVerdict(answerText) {
   return { filled: true, body };
 }
 
+/**
+ * I11：回答文档里「最终复评结果」/「正确答案与解析」各只能出现一次，
+ * 且不得残留模板自带的空占位块。
+ *
+ * 为什么需要：`模板/学生回答模板.md` 末尾预置了两个占位小节。
+ * 弱模型实测（GLM-5.3-Flash low）在文档中间正确写出了最终复评，
+ * 但**忘了删掉模板自带的空占位块** → 同一份文档出现两份「最终复评结果」
+ * （一份已填、一份说「待导师填写」）。接手的人会看到互相矛盾的两个复评区，
+ * 正对应本项目最忌讳的「同一信息写多处 → 不敢确定哪份准」。
+ * 现有 I6 只找第一个小节，填了就通过，**抓不到这种情况**。
+ */
+function checkDuplicateSections(answerText) {
+  const issues = [];
+  for (const name of ['最终复评结果', '正确答案与解析']) {
+    const re = new RegExp(`^##\\s*${name}\\s*$`, 'gm');
+    const count = (answerText.match(re) || []).length;
+    if (count > 1) {
+      issues.push(`「${name}」小节出现 ${count} 次（应只 1 次）`);
+    }
+  }
+  // 残留模板占位文本
+  if (/（整课所有轮次通过后由导师填写）|（评估完成后由导师填写）/.test(answerText)) {
+    issues.push('残留模板占位块「（整课所有轮次通过后由导师填写）」');
+  }
+  return issues;
+}
+
 /** 复评表里是否有非 ✅ 的适用维度 */
 function verdictHasFailure(body) {
   const { header, rows } = parseTable(body);
@@ -378,6 +405,11 @@ function validate(rootDir) {
     if (!v.filled) {
       problems.push(`[I6] 📊「${m.topic}」标为已掌握，但 ${relAnswer} 里${v.reason} —— 掌握缺少证据`);
       continue;
+    }
+    // I11：重复小节 / 残留模板占位
+    const dups = checkDuplicateSections(answerText);
+    if (dups.length) {
+      problems.push(`[I11] ${relAnswer}：${dups.join('；')} —— 同一信息写多处，接手时不敢确定哪份准`);
     }
     // I7：复评表里适用维度须全 ✅
     const f = verdictHasFailure(v.body);
