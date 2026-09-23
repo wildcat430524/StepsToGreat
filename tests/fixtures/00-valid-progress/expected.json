@@ -1,5 +1,7 @@
 {
   "status": "PASSED",
   "invariants": [],
-  "description": "完全正确的档案：路径齐全、掌握有复评证据、无提前推进。校验器必须安静通过"
+  "forbiddenInvariants": ["I3", "I4", "I5", "I6", "I7", "I8", "I10", "I11", "I12"],
+  "problemCount": 0,
+  "description": "完全正确的档案：路径齐全、掌握有复评证据（日/结论/维度表俱全）、无提前推进。校验器必须一条都不报"
 }

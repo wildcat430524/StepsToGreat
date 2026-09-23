@@ -1,5 +1,7 @@
 {
   "status": "PASSED",
   "invariants": [],
-  "description": "课间中间态（上一课已掌握、下一课未发布）+ 备注列「路径；说明」混写。两种真实写法都必须被正确解析，不得误报 I3/I6"
+  "forbiddenInvariants": ["I3", "I4", "I5", "I6", "I7", "I10", "I11", "I12"],
+  "problemCount": 0,
+  "description": "课间中间态（上一课已掌握、下一课未发布）+ 备注列「路径；说明」混写。两种真实写法都必须被正确解析，必须一条都不报"
 }

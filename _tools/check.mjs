@@ -345,6 +345,89 @@ if (existsSync(profile)) {
     }
   }
 
+  // ── 中英配对与并行口径（防双语漂移）──────────────────────
+  //
+  // 中文正文是主版本，英文版是同步维护的镜像。两者会静默漂移：
+  // 「9 条硬规则」这类数字改了一边忘了另一边，读者就得到互相矛盾的说明。
+  // 这里只查**机械可判定**的部分：配对存在 + 关键数字一致 + 不变式条数一致。
+  {
+    const enFiles = walk(ROOT)
+      .filter((f) => f.endsWith('.en.md'))
+      .filter((f) => {
+        const rp = rel(f);
+        return !SKIP_REL_PREFIXES.some((p) => rp === p || rp.startsWith(p + '/'));
+      });
+
+    // 教程目录的英文版**故意用独立的文件名**（README 会按语言给不同链接），
+    // 不存在「同名 + .en」的配对，这里显式登记，避免误报。
+    const EN_PAIR_EXEMPT = new Set([
+      '教程/01-five-minute-setup.en.md',
+      '教程/02-agent-setup-guide.en.md',
+      '教程/03-design-notes.en.md',
+      '教程/ui-mockups.en.md',
+    ]);
+
+    for (const abs of enFiles) {
+      const rp = rel(abs);
+      if (rp === 'README.en.md' || rp === 'AGENTS.en.md') continue; // 根目录特例
+      if (EN_PAIR_EXEMPT.has(rp)) continue;
+      const zh = join(dirname(abs), basename(abs).replace(/\.en\.md$/, '.md'));
+      if (!existsSync(zh)) {
+        problems.push(`${rp}: 英文版存在但找不到对应的中文主版本（${rel(zh)}）—— 配对缺失`);
+      }
+    }
+
+    // 不变式条数：以 协议/04_状态机.md 实际编号为准，中英两版都必须一致
+    const smZh = join(ROOT, '协议', '04_状态机.md');
+    const smEn = join(ROOT, '协议', '04_状态机.en.md');
+    let invCount = 0;
+    if (existsSync(smZh)) {
+      const ids = new Set();
+      for (const m of readFileSync(smZh, 'utf8').matchAll(/\*\*(I\d+)\*\*/g)) ids.add(m[1]);
+      invCount = ids.size;
+    }
+    if (invCount > 0) {
+      for (const f of ['协议/04_状态机.md', '协议/04_状态机.en.md', 'README.md', 'README.en.md']) {
+        const p = join(ROOT, f);
+        if (!existsSync(p)) continue;
+        const text = readFileSync(p, 'utf8');
+        // 只认「声明总数」的写法（这 N 条 / 共 N 条 / 的 N 条 / These N invariants）。
+        // 必须先排除「其余 10 条」（= 12 减去 2 条降级档）与「当时的 10 条」（历史叙述），
+        // 否则这两句正确表述会被误伤。
+        const stripped = text
+          .replace(/其余\s*\d+\s*条不变式/g, '')
+          .replace(/当时的\s*\d+\s*条不变式/g, '')
+          .replace(/原(?:本|来)?\s*\d+\s*条不变式/g, '');
+        for (const re of [/(\d+)\s*条不变式/g, /(?:These|these)\s+(\d+)\s+invariants/g]) {
+          let cm;
+          while ((cm = re.exec(stripped)) !== null) {
+            const claimed = Number(cm[1]);
+            if (claimed !== invCount) {
+              problems.push(`${f}: 文档写「${claimed} 条不变式」，实际有 ${invCount} 条（I1–I${invCount}）—— 请同步`);
+            }
+          }
+        }
+      }
+    }
+
+    // 协议版本声明：档案模板 / 状态机中英两版必须一致
+    const verClaims = [];
+    for (const f of ['协议/04_状态机.md', '协议/04_状态机.en.md', '模板/学习档案模板.md']) {
+      const p = join(ROOT, f);
+      if (!existsSync(p)) continue;
+      const text = readFileSync(p, 'utf8');
+      const m = /(?:当前协议版本|Current protocol version)[^\d]*(\d+)/i.exec(text)
+        || /\*\*协议版本\*\*[^\d]*(\d+)/.exec(text);
+      if (m) verClaims.push({ f, v: Number(m[1]) });
+    }
+    const distinct = [...new Set(verClaims.map((c) => c.v))];
+    if (distinct.length > 1) {
+      problems.push(
+        `协议版本声明不一致：${verClaims.map((c) => `${c.f}=${c.v}`).join(' / ')} —— 中英与模板必须同步`,
+      );
+    }
+  }
+
   // 跳板文件数量：以 setup-agents.mjs 的 TARGETS 实际「path:」条目为准（动态统计，不硬编码）
   {
     const setupSrc = readFileSync(join(ROOT, '_tools', 'setup-agents.mjs'), 'utf8');
@@ -382,7 +465,16 @@ if (existsSync(profile)) {
       }
       // 检查声称「硬规则 N 条」的地方。
       // 注意：要排除「硬规则第 N 条」这种「引用某条编号」的写法（不是声称总数）。
-      for (const f of ['README.md', 'README.en.md', 'AGENTS.md', 'AGENTS.en.md', '协议/00_导师协议.md', '协议/00_导师协议.en.md', '教程/界面示意图.md', '教程/ui-mockups.en.md']) {
+      //
+      // 教程/01、教程/02 曾经漏在这张名单外 —— 结果 AGENTS.md 从 9 条涨到 11 条后，
+      // 教程里「应该回答 9 条硬规则」一直没人发现，新手会误判「AI 没读到规则」。
+      for (const f of [
+        'README.md', 'README.en.md', 'AGENTS.md', 'AGENTS.en.md',
+        '协议/00_导师协议.md', '协议/00_导师协议.en.md',
+        '教程/01-五分钟上手.md', '教程/01-five-minute-setup.en.md',
+        '教程/02-各工具接入指南.md', '教程/02-agent-setup-guide.en.md',
+        '教程/界面示意图.md', '教程/ui-mockups.en.md',
+      ]) {
         const p = join(ROOT, f);
         if (!existsSync(p)) continue;
         const text = readFileSync(p, 'utf8');
@@ -391,10 +483,12 @@ if (existsSync(profile)) {
           /硬规则[」\s]*(?:共\s*)?(\d+)\s*条/g,
           /(\d+)\s*条\s*硬规则/g,
           /答出\s*\*{0,2}(\d+)\s*条/g,
+          // 「正确回答是 **9 条**」「应答出 9 条」「应该回答 9 条硬规则」
+          /(?:正确回答是|应答出|应该回答|应当回答)\s*\*{0,2}(\d+)\s*条/g,
           /(\d+)\s*hard rules/gi,
           /hard rules[^\d]{0,4}(\d+)/gi,
           /has\s+(\d+)\s+items/gi,
-          /answers?\s+\*{0,2}(\d+)/gi,
+          /(?:should\s+(?:say|answer)|answers?)\s+\*{0,2}(\d+)/gi,
         ]) {
           let rm;
           while ((rm = re.exec(text)) !== null) {

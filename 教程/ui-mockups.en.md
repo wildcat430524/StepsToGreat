@@ -36,7 +36,7 @@ flowchart LR
     B --> C["3. Flip the rules switch<br/>(required in Trae)"]
     C --> D["4. Say the first sentence<br/>I'm the student, read AGENTS.md"]
     D --> E{"5. Verify<br/>ask it to recite the hard rules"}
-    E -->|"answers 11"| F["✅ Start learning"]
+    E -->|"answers 12"| F["✅ Start learning"]
     E -->|"can't"| B
 ```
 
@@ -253,7 +253,7 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 │  You: Recite the "Hard rules" section of AGENTS.md —          │
 │       how many are there?                                     │
 │                                                               │
-│  AI:  AGENTS.md's "Hard rules" has 11 items:                  │
+│  AI:  AGENTS.md's "Hard rules" has 12 items:                  │
 │       1. When the student says "done" → re-read the answer    │
 │          document before assessing; never judge from memory   │
 │       2. Assess all of **this round's** questions in one      │
@@ -276,6 +276,9 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 │      10. Do not modify 协议/ 模板/ 学科包/ _tools/            │
 │      11. Rule-level requests → write them into 我的规则.md,   │
 │          never edit the framework                             │
+│      12. With parallel subjects only one "current subject";   │
+│          finish the round before switching; prefix lesson     │
+│          numbers (Python #2)                                  │
 │                                                               │
 │      ✅ I've read the protocol and I'm ready.                 │
 │         What would you like to learn?                         │
@@ -284,7 +287,7 @@ Many tools have **no** "show loaded rules" screen, so you ask it to recite them:
 
 | Result | Verdict | Next step |
 |---|---|---|
-| Answers **11** | ✅ all good | just say "I want to learn X" |
+| Answers **12** | ✅ all good | just say "I want to learn X" |
 | Can't / says file not found | ❌ rules not active | back to step 4 (did you open the folder?) → step 5 (is the switch on?) |
 | Vague, wrong count | ⚠️ partially active | try another tool, or paste `AGENTS.md` in manually |
 

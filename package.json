@@ -1,6 +1,6 @@
 {
   "name": "steps-to-great",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "打开这个文件夹，就有一位一对一导师。A Markdown teaching protocol that turns any AI tool into a one-on-one tutor.",
   "type": "module",
@@ -10,7 +10,8 @@
     "check:mermaid": "node _tools/check-mermaid.mjs",
     "check:state": "node _tools/validate-state.mjs",
     "test:state": "node _tools/validate-state.mjs --fixtures tests/fixtures",
-    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs"
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs",
+    "verify:ci": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs --strict"
   },
   "keywords": [
     "ai-tutor",
@@ -25,5 +26,9 @@
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "mermaid": "^11.4.1",
+    "playwright": "^1.49.1"
   }
 }

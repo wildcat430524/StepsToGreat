@@ -1,0 +1,7 @@
+{
+  "status": "PASSED",
+  "invariants": [],
+  "forbiddenInvariants": ["I3", "I4", "I5", "I6", "I7", "I8", "I9", "I10", "I11", "I12"],
+  "problemCount": 0,
+  "description": "多学科并行：🚦 当前是「英语 #1」，📚 里还有更小号但属于**其他学科**的「Python #2」（状态⏳暂停）。旧实现拿全局课次号比较先后，会误报「提前推进 I9」。必须按学科前缀隔离比较，一条都不报"
+}

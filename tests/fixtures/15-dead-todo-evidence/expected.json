@@ -1,0 +1,6 @@
+{
+  "status": "FAILED",
+  "invariants": ["I5"],
+  "forbiddenInvariants": ["I6", "I7", "I11", "I12"],
+  "description": "⏳ 待办表的「证据入口」是死链 —— 待办无法追溯。旧测试集从未单独覆盖 I5，必须以 I5 报出"
+}

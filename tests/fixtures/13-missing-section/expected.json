@@ -1,0 +1,6 @@
+{
+  "status": "FAILED",
+  "invariants": ["I1"],
+  "forbiddenInvariants": ["I6", "I7", "I11", "I12"],
+  "description": "⏳ 待办表区块被整个删掉 —— 五个状态区块必须齐全，缺一个接手时就读不到状态。必须由 I1 报出"
+}

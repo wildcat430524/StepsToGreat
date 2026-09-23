@@ -1,0 +1,7 @@
+{
+  "status": "PASSED",
+  "invariants": [],
+  "forbiddenInvariants": ["I3", "I4", "I5", "I6", "I7", "I8", "I10", "I11", "I12"],
+  "problemCount": 0,
+  "description": "Markdown 链接目标用尖括号包裹（`[x](<路径>)`，含空格路径的标准写法）。旧实现的 `[^)\\s]+` 遇到尖括号和空格会解析错位 → 误报坏链接。必须正常识别、一条都不报"
+}

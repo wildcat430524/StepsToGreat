@@ -1,0 +1,6 @@
+{
+  "status": "FAILED",
+  "invariants": ["I6"],
+  "forbiddenInvariants": ["I7", "I11"],
+  "description": "掌握证据用 `../../` 指到**校验根目录之外**的文件，且那个文件内容完全合规 —— 旧实现只要 existsSync 就采信，于是「校验 A 目录、采信 B 目录的文件」，完整性边界失效。必须由 I6 的 root 边界拦下"
+}

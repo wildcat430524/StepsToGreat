@@ -122,7 +122,7 @@ I'm the student. Please read AGENTS.md first, then begin.
 Please restate the "Hard rules" section of AGENTS.md — how many rules are there?
 ```
 
-- ✅ **It answers** (it should say 9 hard rules) → everything is fine, carry on
+- ✅ **It answers** (it should say 12 hard rules) → everything is fine, carry on
 - ❌ **It can't answer / says it can't find the file** → go back to steps 3 and 4 and check
 
 > This is the **only reliable way to verify**. Many tools have no UI for "view loaded rules",

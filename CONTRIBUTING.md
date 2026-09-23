@@ -51,7 +51,7 @@
 ```bash
 node _tools/setup-agents.mjs                # 重新生成全部跳板文件
 node _tools/check.mjs                       # 内容质检（必须全过）
-node _tools/validate-state.mjs              # 学习状态校验（不变式 I1–I10）
+node _tools/validate-state.mjs              # 学习状态校验（不变式 I1–I12）
 node _tools/validate-state.mjs --fixtures tests/fixtures   # 状态校验的回归测试集
 node _tools/check-mermaid.mjs               # mermaid 图真实渲染校验（缺依赖会自动跳过）
 ```
@@ -59,7 +59,8 @@ node _tools/check-mermaid.mjs               # mermaid 图真实渲染校验（�
 或一条命令跑完：
 
 ```bash
-npm run verify
+npm run verify          # 本地：mermaid 缺依赖时跳过
+npm run verify:ci       # CI 口径：mermaid 缺依赖直接失败（--strict）
 ```
 
 ### `check.mjs` 检查
@@ -75,28 +76,45 @@ npm run verify
 | **图片引用** | 不许引用 `.png/.jpg/...` —— 本项目约定教程用纯文本示意图（见 `docs/adr/0006`） |
 | 跳板一致性 | 跳板文件必须与脚本生成的一致 |
 | 档案路径 | 学习档案里的引用路径必须存在 |
+| **中英配对 / 口径一致** | `.en.md` 必须有对应中文主版本；「N 条硬规则」「N 条不变式」「协议版本」在中英与模板里必须一致 |
+| **没写死的数量** | 文档里声明的 ADR 篇数、跳板个数、硬规则条数、不变式条数必须与实际相符（改了实际忘了改文档 → 报错） |
 
 ### `validate-state.mjs` 检查
 
 查 `我的学习/00-学习档案.md` 的三处状态（🚦/📊/⏳）是否**自洽、有证据、没提前推进** ——
-判定口径是 [`协议/04_状态机.md`](./协议/04_状态机.md) 第 4 节的 10 条不变式。
+判定口径是 [`协议/04_状态机.md`](./协议/04_状态机.md) 第 4 节的 12 条不变式。
 它**只读**，绝不写文件。
 
 | 编号 | 查什么 |
 |---|---|
-| I1 / I2 | 五个区块齐全；空模板识别为 `NEW` 并跳过 |
-| I3 / I4 / I5 | 🚦、📚 索引、⏳ 证据入口的路径必须真实存在 |
-| **I6 / I7 / I8** | **标 ✅ 已掌握必须真有复评证据**（且复评表适用维度全 ✅、评估日期真实） |
-| I9 | 不许提前推进（上一课未掌握就进入下一课） |
-| I10 | ⏳ 待办表不得重复「当前正在上的课」 |
+| I1 / I2 | 五个区块齐全；空模板识别为 `NEW` 并跳过（**判据是结构，不是关键词**） |
+| I3 / I4 / I5 | 🚦、📚 索引、⏳ 证据入口的路径必须真实存在，且**不越出学习目录** |
+| **I6 / I7 / I8** | **标 ✅ 已掌握必须真有复评证据**（逐题三维表 + 适用维度全 ✅ 无空格 + 真实日历日期 + 非空话结论） |
+| I9 | 不许提前推进（同一学科内，上一课未掌握就进入下一课） |
+| I10 | ⏳ 待办表不得重复「当前正在上的课」（含只写一个路径的写法；复习语义豁免） |
+| I11 | 回答文档里两个结论小节各只出现 1 次，无残留模板占位块 |
+| I12 | 档案协议版本不得高于工具支持版本（版本握手，迁移见 `docs/UPGRADE.md`） |
 
-`tests/fixtures/` 是它的回归测试集：6 个**故意写坏**的档案，各带 `expected.json` 断言命中哪条不变式。
+`tests/fixtures/` 是它的回归测试集：19 个用例（含 `PASSED` 正例与各类反例），
+每个带 `expected.json`。断言支持三档：`invariants`（必须命中）、
+**`forbiddenInvariants`（不许出现的多余报错）**、`problemCount`（报错条数）。
+`forbiddenInvariants` 是必需的 —— 没有它，「校验器过度报错」也能让测试变绿。
+
 加新用例见 [`tests/README.md`](./tests/README.md)。
 
 ### `check-mermaid.mjs` 检查
 
 用**无头 Chromium 真实渲染**每个 ` ```mermaid ` 块 —— 语法错会在 GitHub 上显示成报错框，
-而纯 Markdown 检查查不出来。缺依赖（playwright-core / chromium）时自动跳过，不算失败。
+而纯 Markdown 检查查不出来。
+
+| 模式 | 缺依赖时 | 用在哪 |
+|---|---|---|
+| 默认 | 打印提示并跳过（退出码 0） | 本地 / 纯用户环境 |
+| `--strict` | **报错退出（退出码 1）** | **CI 必须用这个** |
+
+> ⚠️ **为什么 CI 一定要 `--strict`**：旧写法在 Ubuntu 上因为 Chromium 路径写死为 Windows
+> 而永远找不到浏览器 → 脚本「跳过」→ CI 绿灯，**11 张图一张都没验证过**。
+> 现在浏览器路径由 playwright 自己解析（跨平台），且 `npm run verify:ci` 会强制要求依赖存在。
 
 ---
 

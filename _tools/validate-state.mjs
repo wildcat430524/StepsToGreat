@@ -21,11 +21,16 @@
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, relative, resolve, sep } from 'node:path';
+import { join, dirname, relative, resolve, sep, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(HERE, '..');
+
+/** 本工具能安全校验的最高协议版本（I12 版本握手）。
+ *  档案声明的版本高于它 → 报错（工具不认识新口径，不能假装校验通过）。
+ *  低于它 → 只给提示，不阻塞（旧档案照常可用，升级步骤见 docs/UPGRADE.md）。 */
+const SUPPORTED_PROTOCOL_VERSION = 1;
 
 // ── 参数 ─────────────────────────────────────────────────────
 
@@ -58,10 +63,38 @@ if (argv.includes('--help') || argv.includes('-h')) {
 const PROFILE_REL = join('我的学习', '00-学习档案.md');
 
 /** 空模板标记：出现即视为尚未开始（I2）
- *  只认「尚未开始」—— 模板的 🚦 与 📊 两处都有它，可靠。
- *  不要用「（暂无）」「（尚未进行）」当标记：已经开始的档案里也会保留这类空行，
- *  一旦当成标记，「已开始但待办为空」会被误判成空模板 → 静默跳过全部检查。 */
+ *  只认「尚未开始」。
+ *  ⚠️ 光有标记还不够 —— 「尚未开始」在**已开课的档案**里也可能被合法提到
+ *  （更新日志、备注、历史区都会写「X 尚未开始」）。
+ *  只按关键词判定，会让一份真实档案被误判成空模板，从而**静默跳过全部检查**。
+ *  所以 isBlank 还要求：🚦 / 📊 / 📚 三处状态区**都还没填真实值**（见 detectBlank）。
+ */
 const BLANK_MARKERS = ['尚未开始'];
+
+/** 空模板的结构判据：这三个状态区都必须仍是占位/未填。
+ *  只要有一处填了真实值（学科名、课次、路径、掌握行），就不是空模板。 */
+function detectBlank(p) {
+  if (!BLANK_MARKERS.some((m) => p.raw.includes(m))) return false;
+
+  // 📋 学生信息：当前学科 / 目标 仍然是占位
+  const subject = tableValue(p.info, '当前学科');
+  const goal = tableValue(p.info, '目标');
+  const infoFilled = !isPlaceholder(subject) || !isPlaceholder(goal);
+
+  // 🚦 交接状态：当前学科 / 当前课次 / 教学文档 / 回答文档 任一填了真值
+  const handoffFilled = ['当前学科', '当前课次', '教学文档', '回答文档']
+    .map((k) => tableValue(p.handoff, k))
+    .some((v) => !isPlaceholder(v));
+
+  // 📊 掌握表：有没有非占位的知识点行
+  const masteryRows = parseTable(p.mastery).rows
+    .filter((r) => !isPlaceholder(r[0] || '')).length > 0;
+
+  // 📚 课次索引：有没有形如 #N 的真实课次行
+  const indexRows = /^\s*\|\s*`?#\d+/m.test(p.index);
+
+  return !(infoFilled || handoffFilled || masteryRows || indexRows);
+}
 
 /** 占位符：字段值等于这些时视为「没填」 */
 const PLACEHOLDER_VALUES = new Set([
@@ -136,32 +169,150 @@ function parseTable(block) {
 // ── 校验核心 ─────────────────────────────────────────────────
 
 function parseProfile(text) {
-  return {
-    isBlank: BLANK_MARKERS.some((m) => text.includes(m)),
+  const p = {
+    raw: text,
+    isBlank: false,
     info: section(text, /^##\s*📋/),
     handoff: section(text, /^##\s*🚦/),
     mastery: section(text, /^##\s*📊/),
     todo: section(text, /^##\s*⏳/),
     index: section(text, /^##\s*📚/),
   };
+  p.isBlank = detectBlank(p);
+  return p;
 }
 
-/** 「最终复评结果」是否已填写（不是空占位） */
+/** 严格日历校验：格式对 + 真实存在的日期（挡掉 2026-02-31 / 2026-13-01） */
+function isValidDate(value) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || '').trim());
+  if (!m) return false;
+  const year = Number(m[1]);
+  const month = Number(m[2]);
+  const day = Number(m[3]);
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return d.getUTCFullYear() === year && d.getUTCMonth() === month - 1 && d.getUTCDate() === day;
+}
+
+/** 「日期」格子容错：允许 `2026-09-03`，也允许前后带少量说明（取第一个日期串）。
+ *  但取出来的那个必须通过严格日历校验。 */
+function extractDate(cell) {
+  const m = /(\d{4})-(\d{2})-(\d{2})/.exec(String(cell || ''));
+  return m ? m[0] : undefined;
+}
+
+/** 从「1.0」「v1」「协议版本 1」这类写法里取出数字版本号 */
+function extractVersion(cell) {
+  const m = /(\d+(?:\.\d+)?)/.exec(String(cell || ''));
+  return m ? m[1] : '';
+}
+
+/** 「最终复评结果」是否已填写（不是空占位）。
+ *
+ *  这是本项目最重要的一条证据（I6）。宽松判定 = 可以伪造掌握，
+ *  所以这里要求**三件东西同时成立**：
+ *    ① 有「复评日期」，且是真实存在的日期；
+ *    ② 有「最终结论」，且不是空话（要说出结论本身）；
+ *    ③ 有**有效复评表**：至少 1 个题目行，且该行的适用维度都有明确取值。
+ */
 function hasFinalVerdict(answerText) {
   const m = /^##\s*最终复评结果\s*$/m.exec(answerText);
   if (!m) return { filled: false, reason: '没有「最终复评结果」小节' };
   const after = answerText.slice(m.index + m[0].length);
-  // 截到下一个二级标题
   const next = after.search(/^##\s/m);
   const body = (next >= 0 ? after.slice(0, next) : after).trim();
   if (!body) return { filled: false, reason: '「最终复评结果」小节是空的' };
   if (/（.*由导师填写）|（待填）|<yyyy-mm-dd>/.test(body)) {
     return { filled: false, reason: '「最终复评结果」仍是占位内容' };
   }
-  if (!/最终结论|复评日期/.test(body)) {
-    return { filled: false, reason: '「最终复评结果」缺「复评日期」或「最终结论」' };
+
+  // ① 复评日期（容忍 **加粗** 与 `代码` 包裹）
+  const dateCell = /复评日期[*`]{0,2}\s*[:：]?\s*[*`]{0,2}\s*([^\n]+)/.exec(body);
+  const date = extractDate(dateCell ? dateCell[1] : '');
+  if (!date) {
+    return { filled: false, reason: '「最终复评结果」缺真实日期的「复评日期」' };
+  }
+  if (!isValidDate(date)) {
+    return { filled: false, reason: `「最终复评结果」的复评日期不是真实日期 → ${date}` };
+  }
+
+  // ② 最终结论：必须真的给出结论（不能只有标题或「待确认」）
+  const concl = /最终结论[*`]{0,2}\s*[:：]\s*(.+)/.exec(body);
+  if (!concl) {
+    return { filled: false, reason: '「最终复评结果」缺「最终结论」' };
+  }
+  const conclText = concl[1].replace(/[*`]/g, '').trim();
+  if (!conclText || /^(待确认|待定|待填|TODO)/i.test(conclText)) {
+    return { filled: false, reason: '「最终复评结果」的「最终结论」还是空话（待确认/待定）' };
+  }
+
+  // ③ 有效复评表
+  const v = verdictTable(body);
+  if (!v.hasRows) {
+    return { filled: false, reason: '「最终复评结果」里没有复评表（或表里没有题目行）' };
+  }
+  if (!v.dims.length) {
+    return { filled: false, reason: '复评表里找不到任何评估维度列（模板表头：概念理解/逻辑正确/规范维度）' };
   }
   return { filled: true, body };
+}
+
+/**
+ * 解析复评表，返回维度列与题目行。
+ *
+ * 为什么要求「必须认出维度列」：
+ * 旧实现认不出维度时会把中间列**全部当成维度**，于是空表、错表头都能混过 I7
+ * （状态自洽性检查形同虚设）。宁可报「认不出表头」也不要放过一个假掌握。
+ */
+function verdictTable(body) {
+  const { header, rows } = parseTable(body);
+  if (!header.length) return { hasRows: false, dims: [], rows: [] };
+  const dims = [];
+  header.forEach((h, i) => {
+    if (/概念|逻辑|规范|语法|表达|推导|表述|答题|维度|理解|计算/.test(h)) dims.push(i);
+  });
+  // 题目行：第 0 列看起来像题号（数字 / 第 N 题 / 问题 N）
+  const dataRows = rows.filter((r) => {
+    const first = (r[0] || '').trim();
+    if (!first) return false;
+    if (/^(题号|题|编号)$/.test(first)) return false;
+    return /\d/.test(first) || /第\s*\d+\s*题/.test(first);
+  });
+  return { hasRows: dataRows.length > 0, dims, rows: dataRows };
+}
+
+/** 复评表里是否有非 ✅ 的适用维度 */
+function verdictHasFailure(body) {
+  const { dims, rows } = verdictTable(body);
+  if (!rows.length) return { any: false, detail: '' };
+  const bad = [];
+  for (const r of rows) {
+    for (const i of dims) {
+      const cell = (r[i] || '').trim();
+      if (!cell) continue; // 空单元格由调用方的「取值必须明确」规则处理
+      if (/不适用|N\/A|^—|^-{2}/.test(cell)) continue;
+      if (!cell.includes('✅')) bad.push(`${r[0] || '?'}: ${dimLabel(i)}=${cell}`);
+    }
+  }
+  return { any: bad.length > 0, detail: bad.join(', ') };
+
+  function dimLabel(i) {
+    return `第 ${i + 1} 列`;
+  }
+}
+
+/** 复评表里是否有「该填却没填」的适用维度格。
+ *  I7 查的是「填了但不是 ✅」；空格式属于「没填完」，同样不能算掌握证据。 */
+function verdictIncomplete(body) {
+  const { dims, rows } = verdictTable(body);
+  const empty = [];
+  for (const r of rows) {
+    for (const i of dims) {
+      if (!(r[i] || '').trim()) empty.push(`${r[0] || '?'} 第 ${i + 1} 列`);
+    }
+  }
+  return { any: empty.length > 0, detail: empty.join(', ') };
 }
 
 /**
@@ -189,28 +340,6 @@ function checkDuplicateSections(answerText) {
     issues.push('残留模板占位块「（整课所有轮次通过后由导师填写）」');
   }
   return issues;
-}
-
-/** 复评表里是否有非 ✅ 的适用维度 */
-function verdictHasFailure(body) {
-  const { header, rows } = parseTable(body);
-  if (!rows.length) return { any: false, detail: '' };
-  // 找维度列（排除题号与结论）
-  const dimIdx = [];
-  header.forEach((h, i) => {
-    if (/概念|逻辑|规范|语法|表达|推导|表述|答题|维度/.test(h)) dimIdx.push(i);
-  });
-  if (!dimIdx.length) dimIdx.push(...header.map((_, i) => i).filter((i) => i > 0 && i < header.length - 1));
-  const bad = [];
-  for (const r of rows) {
-    for (const i of dimIdx) {
-      const cell = (r[i] || '').trim();
-      if (!cell) continue;
-      if (/不适用|N\/A|—\s*不适用|-{2}/.test(cell)) continue;
-      if (!cell.includes('✅')) bad.push(`${r[0] || '?'}: ${header[i] || '?'}=${cell}`);
-    }
-  }
-  return { any: bad.length > 0, detail: bad.join(', ') };
 }
 
 function validate(rootDir) {
@@ -265,6 +394,16 @@ function validate(rootDir) {
     return m ? Number(m[1]) : undefined;
   })();
 
+  /** 🚦 当前课次的学科前缀（多学科并行时写 `Python #2`）。
+   *  没写前缀时返回 undefined —— 此时 I9 退回「全局比较」的旧口径。 */
+  const curLessonSubject = (() => {
+    const t = clean(curLessonRaw || '');
+    const m = /#\s*\d+/.exec(t);
+    if (!m) return undefined;
+    const prefix = t.slice(0, m.index).replace(/[`*|\s]+/g, '').trim();
+    return prefix || undefined;
+  })();
+
   const resolveRel = (v) => {
     if (isPlaceholder(v)) return undefined;
     const cleaned = clean(v).split('#')[0].trim();
@@ -272,13 +411,24 @@ function validate(rootDir) {
     return resolveAny(cleaned);
   };
 
+  /** 证据文件必须落在被校验的根目录内。
+   *  不设这条边界时，`../../别人的档案.md` 这种路径只要真实存在就会被当成
+   *  有效证据 —— 校验的是 A 目录，采信的是 B 目录的文件，完整性直接失效。 */
+  const insideRoot = (abs) => {
+    const r = relative(rootDir, abs);
+    return r !== '' && !r.startsWith('..') && !isAbsolute(r);
+  };
+
   /** 宽容解析：档案里的相对链接可能相对于「档案所在目录」或「项目根目录」写。
-   *  两个候选依次试，都不存在则返回「相对档案目录」的那个（报错信息更好读）。 */
+   *  两个候选依次试，都不存在则返回「相对档案目录」的那个（报错信息更好读）。
+   *  越出 rootDir 的候选一律视为不存在（记录到越界清单，由 I3/I6 报出）。 */
+  const escaped = [];
   const resolveAny = (rel) => {
     const a = resolve(BASE_DIR, rel);
-    if (existsSync(a)) return a;
+    if (existsSync(a) && insideRoot(a)) return a;
     const b = resolve(rootDir, rel);
-    if (existsSync(b)) return b;
+    if (existsSync(b) && insideRoot(b)) return b;
+    if (existsSync(a) && !insideRoot(a)) escaped.push(rel);
     return a;
   };
 
@@ -290,8 +440,8 @@ function validate(rootDir) {
       continue;
     }
     const abs = resolveRel(val);
-    if (!abs || !existsSync(abs)) {
-      problems.push(`[I3] 🚦 的 ${label} 指向不存在的文件 → ${clean(val)}`);
+    if (!abs || !existsSync(abs) || !insideRoot(abs)) {
+      problems.push(`[I3] 🚦 的 ${label} 指向不存在的文件（或越出学习目录）→ ${clean(val)}`);
     }
   }
 
@@ -303,26 +453,56 @@ function validate(rootDir) {
   const cTeach = idxCol('教学文档');
   const cAnswer = idxCol('回答文档');
 
-  const lessons = []; // {num, topic, teach, answer}
+  /** 多学科并行时，课次号必须带学科前缀（`Python #2` / `英语 #1`）——
+   *  否则各学科的 #1、#2 会撞号，比较「课次大小」完全没有意义。
+   *  这里把课次拆成 {subject, num}，让 I9 只在**同一学科内**比较先后。 */
+  const parseLessonCell = (cell) => {
+    const t = clean(cell || '');
+    const numM = /#\s*(\d+)/.exec(t);
+    if (!numM) return undefined;
+    const subject = t.slice(0, numM.index).replace(/[`*|\s]+/g, '').trim();
+    return { subject: subject || undefined, num: Number(numM[1]) };
+  };
+
+  const lessons = []; // {subject, num, topic, teach, answer}
   for (const r of idxTable.rows) {
-    const numM = /#(\d+)/.exec(r[cLesson] || '');
-    if (!numM) continue;
+    const parsed = parseLessonCell(r[cLesson]);
+    if (!parsed) continue;
     lessons.push({
-      num: Number(numM[1]),
+      subject: parsed.subject,
+      num: parsed.num,
       topic: clean(r[cTopic] || ''),
       teach: clean(r[cTeach] || ''),
       answer: clean(r[cAnswer] || ''),
     });
   }
 
+  /** 从单元格里抽出 markdown 链接目标。
+   *  支持三种真实写法：
+   *    ① 无空格：`[x](学科/Python/01_学生回答.md)`
+   *    ② 含空格：`[x](<学科/我 的课/01_学生回答.md>)` 或 `[x](学科/我 的课/1.md)`
+   *    ③ 带锚点/查询：`[x](a.md#最终复评结果)`
+   *  旧实现用 `[^)\s]+`，遇到含空格的文件名会**只取到一半** → 误报「文件不存在」。 */
+  const mdLinkTarget = (s) => {
+    const m = /\[[^\]]*\]\(\s*(<[^>]*>|[^)]+?)\s*\)/.exec(s);
+    if (!m) return undefined;
+    let t = m[1].trim();
+    if (t.startsWith('<') && t.endsWith('>')) t = t.slice(1, -1);
+    return t.split('#')[0].split('?')[0].trim() || undefined;
+  };
+
   // ── I4：📚 索引路径存在 ───────────────────────────────────
   for (const l of lessons) {
     for (const [label, raw] of [['教学文档', l.teach], ['回答文档', l.answer]]) {
       if (isPlaceholder(raw)) continue;
-      const m = /\[[^\]]*\]\(([^)\s]+)\)/.exec(raw) || /^([^\s|]+)$/.exec(raw);
-      const target = m ? m[1].split('#')[0] : raw;
+      const linked = mdLinkTarget(raw) || (/^\S+$/.test(raw) ? raw.split('#')[0] : undefined);
+      if (!linked) {
+        // 既不是链接、也不是裸路径 —— 可能只是「文档已建」之类的说明，跳过
+        continue;
+      }
+      const target = linked;
       const abs = resolveAny(target);
-      if (!existsSync(abs)) {
+      if (!existsSync(abs) || !insideRoot(abs)) {
         problems.push(`[I4] 📚 课次 #${l.num} 的${label}指向不存在的文件 → ${target}`);
       }
     }
@@ -352,7 +532,13 @@ function validate(rootDir) {
     // 1) 优先按课次编号匹配（📊 的备注里常带 #N）
     const byNum = /#(\d+)/.exec(topic);
     if (byNum) {
-      const l = lessons.find((x) => x.num === Number(byNum[1]));
+      const n = Number(byNum[1]);
+      // 知识点里写了学科前缀（`Python #1 …`）→ 精确匹配同学科；
+      // 否则若全库只有一个该编号，也能唯一确定。
+      const prefixed = lessons.filter((x) => x.num === n);
+      const l = prefixed.length === 1
+        ? prefixed[0]
+        : prefixed.find((x) => x.subject && topic.includes(x.subject));
       if (l) return l.answer;
     }
     // 2) 按知识点名近似匹配
@@ -370,9 +556,9 @@ function validate(rootDir) {
    *  且要求它像路径（含 `/` 或以 `.md` 结尾）。 */
   const linkTarget = (cell) => {
     if (!cell) return undefined;
-    const m = /\[[^\]]*\]\(([^)\s]+)\)/.exec(cell);
-    const raw = m ? m[1] : cell.split(/[；;，,\s]/)[0];
-    const cleaned = raw.split('#')[0].trim();
+    const m = mdLinkTarget(cell);
+    const raw = m || cell.split(/[；;，,\s]/)[0];
+    const cleaned = raw.split('#')[0].split('?')[0].trim();
     if (!cleaned) return undefined;
     if (!m && !/\/|\.md$/i.test(cleaned)) return undefined; // 不像路径就不当路径
     return cleaned || undefined;
@@ -384,9 +570,12 @@ function validate(rootDir) {
     if (!isMastered(m.status)) continue;
     masteredCount++;
 
-    // I8：评估日期必须是真实日期
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(m.date) && !/\d{4}-\d{2}-\d{2}/.test(m.date)) {
+    // I8：评估日期必须是真实日期（格式对 + 日历上真的存在）
+    const mDateOnly = extractDate(m.date);
+    if (!mDateOnly) {
       problems.push(`[I8] 📊「${m.topic}」标为已掌握，但评估日期不是真实日期 → 「${m.date}」`);
+    } else if (!isValidDate(mDateOnly)) {
+      problems.push(`[I8] 📊「${m.topic}」标为已掌握，但评估日期不是有效日期（日历上不存在）→ 「${mDateOnly}」`);
     }
 
     // I6：必须找得到回答文档，且其中「最终复评结果」已填写
@@ -396,8 +585,8 @@ function validate(rootDir) {
       continue;
     }
     const abs = resolveAny(relAnswer);
-    if (!existsSync(abs)) {
-      problems.push(`[I6] 📊「${m.topic}」标为已掌握，但证据文件不存在 → ${relAnswer}`);
+    if (!existsSync(abs) || !insideRoot(abs)) {
+      problems.push(`[I6] 📊「${m.topic}」标为已掌握，但证据文件不存在（或越出学习目录）→ ${relAnswer}`);
       continue;
     }
     const answerText = readFileSync(abs, 'utf8');
@@ -411,7 +600,11 @@ function validate(rootDir) {
     if (dups.length) {
       problems.push(`[I11] ${relAnswer}：${dups.join('；')} —— 同一信息写多处，接手时不敢确定哪份准`);
     }
-    // I7：复评表里适用维度须全 ✅
+    // I7：复评表里适用维度须全 ✅；空格子属于「没填完」，也不构成掌握证据
+    const inc = verdictIncomplete(v.body);
+    if (inc.any) {
+      problems.push(`[I7] 📊「${m.topic}」标为已掌握，但复评表的适用维度有空白格（${inc.detail}）—— 状态自相矛盾`);
+    }
     const f = verdictHasFailure(v.body);
     if (f.any) {
       problems.push(`[I7] 📊「${m.topic}」标为已掌握，但复评表里有非 ✅ 的适用维度（${f.detail}）—— 状态自相矛盾`);
@@ -419,19 +612,27 @@ function validate(rootDir) {
   }
 
   // ── I9：不许提前推进 ─────────────────────────────────────
+  //
+  // 多学科并行时**只在同一学科内**比较课次先后：`英语 #1` 与 `Python #2`
+  // 之间没有「先后推进」关系，拿全局课次号比较会误报「提前推进」。
+  //   · 🚦 写了学科前缀 → 只比同前缀的课
+  //   · 🚦 没写前缀（单学科用法）→ 退回全局比较，兼容旧档案
   if (curLessonNum !== undefined) {
-    const earlier = lessons.filter((l) => l.num < curLessonNum);
+    const sameSubject = (l) => !curLessonSubject || l.subject === curLessonSubject;
+    const earlier = lessons.filter((l) => sameSubject(l) && l.num < curLessonNum);
     for (const l of earlier) {
       const m = mastery.find((x) => l.topic && (x.topic.includes(l.topic.slice(0, 6)) || l.topic.includes(x.topic.slice(0, 6))));
       if (m && /⏳|待作答|未作答/.test(m.status)) {
+        const label = l.subject ? `${l.subject} #${l.num}` : `#${l.num}`;
         problems.push(
-          `[I9] 提前推进：🚦 已在 #${curLessonNum}，但 📚 的 #${l.num}「${l.topic}」在 📊 里仍是「${m.status}」`,
+          `[I9] 提前推进：🚦 已在 #${curLessonNum}，但 📚 的 ${label}「${l.topic}」在 📊 里仍是「${m.status}」`,
         );
       }
     }
-    // 当前课的编号必须出现在 📚 索引里
-    if (!lessons.some((l) => l.num === curLessonNum)) {
-      warnings.push(`[I9] 🚦 当前课次 #${curLessonNum} 没有出现在 📚 课次索引里`);
+    // 当前课的编号必须出现在 📚 索引里（同前缀下匹配）
+    if (!lessons.some((l) => sameSubject(l) && l.num === curLessonNum)) {
+      const label = curLessonSubject ? `${curLessonSubject} #${curLessonNum}` : `#${curLessonNum}`;
+      warnings.push(`[I9] 🚦 当前课次 ${label} 没有出现在 📚 课次索引里`);
     }
   }
 
@@ -448,23 +649,73 @@ function validate(rootDir) {
     const target = linkTarget(ev);
     if (!target) continue;
     const abs = resolveAny(target);
-    if (!existsSync(abs)) {
+    if (!existsSync(abs) || !insideRoot(abs)) {
       problems.push(`[I5] ⏳ 待办「${item}」的证据入口指向不存在的文件 → ${target}`);
     }
   }
 
   // ── I10：待办表不得重复「当前正在上的课」 ─────────────────
+  //
+  // 只看「证据入口同时包含教学文档 + 回答文档」是不够的：真实写法还有
+  //   · 只写回答文档那一个路径
+  //   · 只写课名/课次（`#2 循环语句`）
+  // 这些都等价于把「当前课」重复了一遍，同样会让接手的导师不确定以哪份为准。
   if (curLessonRaw && !isPlaceholder(curLessonRaw)) {
+    const curTopic = clean(curLessonRaw).replace(/^#\d+\s*/, '').trim();
+    const curPaths = [clean(teachDoc || ''), clean(answerDoc || '')]
+      .filter((v) => v && !isPlaceholder(v))
+      .map((v) => v.replace(/[`*]/g, '').trim());
+
+    const repeatsCurrentLesson = (row) => {
+      const ev = clean(row[tEvidence] || '');
+      const item = clean(row[tItem] || '');
+      // a) 复习/重讲语义优先豁免：
+      //    「间隔复习 #1」「费曼重讲：X」的证据入口**本来就会指向当前课的回答文档**，
+      //    这是挂在待办里的正常事项，不是「把当前正在上的课重复写了一遍」。
+      if (/复习|回顾|重讲|重做|复评|费曼|加固|回炉/.test(item + ev)) return false;
+      // b) 证据入口命中当前课的任一文档路径 —— 最强信号，一定算重复
+      for (const cp of curPaths) {
+        if (cp && ev.includes(cp)) return true;
+      }
+      // c) 提到当前课次/课名
+      if (curLessonNum !== undefined && new RegExp(`#\\s*0*${curLessonNum}(?!\\d)`).test(ev || item)) return true;
+      if (curTopic.length >= 2) {
+        const short = curTopic.slice(0, 6);
+        if (ev.includes(short) || item.includes(short)) return true;
+      }
+      return false;
+    };
+
     for (const r of todoTable.rows) {
       const item = clean(r[tItem] || '');
       if (!item || isPlaceholder(item)) continue;
-      const h = clean(r[tEvidence] || '');
-      if (teachDoc && answerDoc
-        && h && clean(teachDoc) && clean(answerDoc)
-        && (h.includes(clean(teachDoc)) && h.includes(clean(answerDoc)))) {
+      if (repeatsCurrentLesson(r)) {
         problems.push(`[I10] ⏳ 待办表重复了「当前正在上的课」（${item}）—— 状态应只在 🚦 维护`);
       }
     }
+  }
+
+  // ── I12：协议版本握手 ────────────────────────────────────
+  // 档案声明自己按哪个版本的协议写的。工具只认识 SUPPORTED_PROTOCOL_VERSION，
+  // 遇到更高的版本必须**明确报错**，而不是继续用旧口径校验（那会给出假的安全感）。
+  const pvRaw = tableValue(p.info, '协议版本') || tableValue(p.handoff, '协议版本');
+  if (pvRaw && !isPlaceholder(pvRaw)) {
+    const pv = Number(extractVersion(pvRaw));
+    if (Number.isFinite(pv)) {
+      if (pv > SUPPORTED_PROTOCOL_VERSION) {
+        problems.push(
+          `[I12] 档案协议版本 ${pv} 高于本工具支持的 ${SUPPORTED_PROTOCOL_VERSION} `
+          + '—— 请更新 _tools（git pull），不要用旧校验器判定新档案',
+        );
+      } else if (pv < SUPPORTED_PROTOCOL_VERSION) {
+        warnings.push(
+          `[I12] 档案协议版本 ${pv} 低于当前 ${SUPPORTED_PROTOCOL_VERSION} `
+          + '—— 迁移步骤见 docs/UPGRADE.md（旧档案仍可用）',
+        );
+      }
+    }
+  } else {
+    infos.push(`[I12] 档案未声明「协议版本」—— 视为 ${SUPPORTED_PROTOCOL_VERSION}（模板已含该行，可顺手补上）`);
   }
 
   return {
@@ -515,9 +766,21 @@ function runFixtures(dir) {
     }
     const missingIds = wantIds.filter((id) => !hitIds.has(id));
 
-    const ok = statusOk && missingIds.length === 0;
+    // 不期望出现的不变式必须**不**出现 —— 没有这条，校验器「过度报错」
+    // （顺手报一堆无关错误）也会让用例变绿，测试就失去了意义。
+    const forbidIds = c.expect.forbiddenInvariants || [];
+    const extraIds = forbidIds.filter((id) => hitIds.has(id));
+
+    // 期望的错误条数（可选，用于「只应报 1 条」这类强断言）
+    const exactCount = c.expect.problemCount;
+    const countOk = exactCount === undefined || r.problems.length === exactCount;
+
+    const ok = statusOk && missingIds.length === 0 && extraIds.length === 0 && countOk;
     if (!ok) failed++;
-    results.push({ name: c.name, ok, actualStatus, wantStatus, missingIds, wantIds, problems: r.problems });
+    results.push({
+      name: c.name, ok, actualStatus, wantStatus, missingIds, extraIds, wantIds, exactCount,
+      actualCount: r.problems.length, problems: r.problems,
+    });
   }
 
   console.log('');
@@ -527,6 +790,10 @@ function runFixtures(dir) {
     console.log(`   ${mark} ${r.name}  （期望 ${r.wantStatus} / 实际 ${r.actualStatus}）`);
     if (!r.ok) {
       if (r.missingIds.length) console.log(`        未命中不变式：${r.missingIds.join(', ')}`);
+      if (r.extraIds.length) console.log(`        不应出现的多余报错：${r.extraIds.join(', ')}（过度报错）`);
+      if (r.exactCount !== undefined && r.exactCount !== r.actualCount) {
+        console.log(`        报错条数：期望 ${r.exactCount}，实际 ${r.actualCount}`);
+      }
       for (const p of r.problems) console.log(`        · ${p}`);
     }
   }

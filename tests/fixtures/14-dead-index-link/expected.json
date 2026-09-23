@@ -1,0 +1,6 @@
+{
+  "status": "FAILED",
+  "invariants": ["I4"],
+  "forbiddenInvariants": ["I6", "I7", "I11", "I12"],
+  "description": "📚 课次索引里的「回答文档」列是死链（目录不存在）—— 旧测试集从未单独覆盖 I4。必须以 I4 报出，且不许误报掌握类不变式"
+}

@@ -14,8 +14,8 @@
  * 新增工具时：在 TARGETS 里加一条即可，不要再手写文件。
  */
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -299,6 +299,10 @@ const MATRIX = [
   ['Qwen Code', 'QWEN.md', '❌ 不原生读', '本仓库已放 QWEN.md 跳板'],
 ];
 
+/** 矩阵的核验信息 —— 这些断言会随各厂商改版过时。
+ *  与其让读者以为它们是永久事实，不如把「什么时候核验的、去哪核验」写出来。 */
+const MATRIX_VERIFIED = '2026-09';
+
 const matrixMd = `# AI 工具兼容性矩阵
 
 > **本文件由 \`_tools/setup-agents.mjs\` 生成**，不要手工修改。
@@ -313,9 +317,23 @@ const matrixMd = `# AI 工具兼容性矩阵
 
 ## 矩阵
 
+> ⚠️ **下面这些断言会随各厂商改版而过时。** 最后核验时间：**${MATRIX_VERIFIED}**。
+> 如果某个工具的行为和表里不一致，**以工具自己的官方文档为准**，并欢迎提 PR 修正本表。
+
 | ${MATRIX[0].join(' | ')} |
 |${MATRIX[1].map(() => '---').join('|')}|
 ${MATRIX.slice(2).map((r) => `| ${r.join(' | ')} |`).join('\n')}
+
+### 表里哪些列最容易过时
+
+| 列 | 为什么易变 | 去哪核验 |
+|---|---|---|
+| **需要学生手动做什么** | 厂商随时可能改默认值（尤其开关类） | 各工具官方文档的「rules / instructions」页 |
+| **是否原生读 AGENTS.md** | \`AGENTS.md\` 已渐成事实标准，支持它的工具在增加 | 官方 changelog |
+| **规则文件路径** | 目录约定会变 | 官方文档 |
+
+> **判据**：不管表里怎么写，唯一靠得住的验证方式是**让 AI 复述硬规则条数**
+> （见 [\`教程/01-五分钟上手.md\`](../教程/01-五分钟上手.md) 第 6 步）。
 
 ## 一键生成
 
@@ -379,6 +397,56 @@ for (const t of TARGETS) {
     writeFileSync(abs, matrixMd, 'utf8');
     written++;
     console.log('  ✅ docs/AGENT-COMPAT.md');
+  }
+}
+
+// ── 陈旧跳板检测（只在 --check 下做）──────────────────────────
+//
+// 从 TARGETS 里删掉某个工具后，仓库里那份生成文件会**留在原地**：
+// 它内容与脚本已经不一致但没人检查它（只检查期望清单里的文件），
+// 于是它会继续以「规则入口」的身份被那个工具读到 —— 静默漂移。
+//
+// 判据必须**只看生成物自己的指纹**，不能看「文件里提到过 AGENTS.md」——
+// 否则 README、ADR、解说词这些正常文档都会被误判成陈旧跳板。
+// 生成物第一行固定是 `# <工具名> · 请先读 AGENTS.md`，第二段固定是那句
+// 「本文件是**自动生成的跳板**」，两者同时命中才认。
+if (CHECK_ONLY) {
+  const expected = new Set(TARGETS.filter((t) => !t.skip).map((t) => t.path.replace(/\\/g, '/')));
+  const stale = [];
+  const POINTER_HEAD = /^#\s+\S.*·\s*请先读\s+AGENTS\.md\s*$/;
+  const POINTER_MARK = /本文件是\*\*自动生成的跳板\*\*/;
+
+  function scanStale(dir, depth) {
+    if (depth < 0) return;
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch { return; }
+    for (const e of entries) {
+      if (e.name === 'node_modules' || e.name === '.git') continue;
+      const abs = join(dir, e.name);
+      const rel = relative(ROOT, abs).replace(/\\/g, '/');
+      if (e.isDirectory()) {
+        if (depth > 0) scanStale(abs, depth - 1);
+        continue;
+      }
+      if (expected.has(rel)) continue;
+      let text;
+      try {
+        text = readFileSync(abs, 'utf8');
+      } catch { continue; }
+      if (text.length > 4000) continue; // 生成物都很短
+      const firstLine = text.split(/\r?\n/, 1)[0].trim();
+      if (POINTER_HEAD.test(firstLine) && POINTER_MARK.test(text)) stale.push(rel);
+    }
+  }
+  // 跳板最深在两级目录里（如 `.trae/rules/xxx.md`、`.github/copilot-instructions.md`）
+  scanStale(ROOT, 3);
+
+  if (stale.length) {
+    console.error(`❌ 发现 ${stale.length} 个陈旧跳板（指向 AGENTS.md 但已不在生成清单里）：\n  ${stale.join('\n  ')}`);
+    console.error('   若该工具已不再支持/改名 → 删掉这些文件；若仍支持 → 把它加回 TARGETS。');
+    process.exit(1);
   }
 }
 

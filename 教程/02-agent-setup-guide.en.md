@@ -70,7 +70,7 @@ Now changing the rules means changing only `AGENTS.md`, and the pointer files ar
 | 4 | **`File → Open Folder`** → select the `StepsToGreat` **folder** (not a file!) | [§4](./ui-mockups.en.md#4-open-the-folder-the-easy-step-to-get-wrong) |
 | 5 | **Settings (gear) → Rules → Import settings → turn on "Include AGENTS.md in context"** | [§5](./ui-mockups.en.md#5-flip-the-rules-switch-the-most-critical-step-90-of-people-miss-it) |
 | 6 | Start a new chat and type "I'm the student. Please read AGENTS.md first, then begin." | [§6](./ui-mockups.en.md#6-say-the-first-sentence) |
-| 7 | Ask it to recite the hard rules and confirm it read them (should answer **9**) | [§7](./ui-mockups.en.md#7-verify-it-really-read-them-the-only-reliable-check) |
+| 7 | Ask it to recite the hard rules and confirm it read them (should answer **12**) | [§7](./ui-mockups.en.md#7-verify-it-really-read-them-the-only-reliable-check) |
 
 > ⚠️ **Steps 4 and 5 are the two easiest to get wrong.** Picking a file in step 4 kills all the rules; skipping step 5 means Trae never reads `AGENTS.md`.
 > This project ships an `alwaysApply: true` pointer in `.trae/rules/`, so step 5 will **probably still work** if you forget — but do it anyway.
@@ -83,7 +83,7 @@ Now changing the rules means changing only `AGENTS.md`, and the pointer files ar
 Please restate the "Hard rules" section of AGENTS.md — how many rules are there?
 ```
 
-The correct answer is **9**. Can't answer → go back to steps 5 and 6.
+The correct answer is **12**. Can't answer → go back to steps 5 and 6.
 
 ### Free quota
 

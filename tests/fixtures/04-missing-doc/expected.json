@@ -1,5 +1,6 @@
 {
   "status": "FAILED",
   "invariants": ["I3"],
-  "description": "🚦 的「回答文档」指向不存在的目录 —— 接手时找不到文件必须报错"
+  "forbiddenInvariants": ["I6", "I7", "I11"],
+  "description": "🚦 的「回答文档」指向不存在的目录 —— 接手时找不到文件必须报错（I4 同时命中同类死链是合理的）"
 }

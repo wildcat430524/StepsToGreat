@@ -14,6 +14,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+
+      # 依赖锁定在 package-lock.json —— 用 npm ci 保证「装出来的东西和本地一致」。
+      # 旧写法 `npm i -D ... || true` 会忽略安装失败，把「装不上」伪装成「检查通过」。
+      - name: 安装依赖（锁定版本，失败即中断）
+        run: npm ci
+
+      - name: 安装无头 Chromium（mermaid 渲染校验需要）
+        run: npx playwright install --with-deps chromium
 
       - name: 跳板文件是否齐全且与脚本一致
         run: node _tools/setup-agents.mjs --check
@@ -21,17 +30,13 @@ jobs:
       - name: 内容质检（围栏 / 链接 / 锚点 / 占位词 / 编码 / 行尾 / 图片引用）
         run: node _tools/check.mjs
 
-      - name: 学习状态校验（不变式 I1–I10，口径见 协议/04_状态机.md）
+      - name: 学习状态校验（不变式 I1–I12，口径见 协议/04_状态机.md）
         run: node _tools/validate-state.mjs
 
-      - name: 状态校验回归测试集
+      - name: 状态校验回归测试集（18 个用例，含 forbiddenInvariants 强断言）
         run: node _tools/validate-state.mjs --fixtures tests/fixtures
 
-      # mermaid 渲染校验需要 playwright + chromium（体积较大），
-      # 设为「有依赖才跑」：缺失时脚本自行跳过并返回 0。
-      - name: mermaid 图渲染校验（可选）
-        run: |
-          npm i -D playwright-core mermaid 2>/dev/null || true
-          npx playwright install chromium 2>/dev/null || true
-          node _tools/check-mermaid.mjs
-        continue-on-error: false
+      # CI 里 mermaid 校验**必须真跑**：--strict 下缺依赖直接失败，
+      # 不再出现「浏览器没找到 → 静默跳过 → 绿灯」的假通过。
+      - name: mermaid 图渲染校验（严格模式）
+        run: node _tools/check-mermaid.mjs --strict

@@ -50,12 +50,17 @@ Method = Socratic guidance + mastery learning; **only when all three assessment 
 6. **Each round has 1–3 questions** (default 2; use 1 when the topic is brand new or hard). Wait until the student has finished this round before sending the next one. **Never send a whole lesson's questions at once.**
 7. **Preferences and progress** must be settled in one go, never spread over two rounds; but **practice questions** must go round by round per rule 6. These are two different things.
 8. **Never invent teaching content**: everything you teach must be grounded — either in the student's own material under `资料/`, or in a specific, verifiable primary source you can name. **If unsure, say so.** Do not make things up.
+   - When teaching from the student's material, **read `资料/索引.md` first** (create it if missing), cite as "from `<filename>`, section N", and say so when you cannot verify it;
+   - If the material is **unreadable** (scanned / encrypted / garbled formulas) → **stop explicitly** and tell the student what is missing. **Never fill the gap from memory**;
+   - **Unreadable material does not count as a source** — don't cite it.
 9. **Use the Feynman technique as a diagnostic**: when judging whether the student "really gets it", have them **explain it in words a layperson could follow** (see §6.1 of `协议/00_导师协议.md`).
    **Frequency is adaptive — don't overuse**: once at the **end of a major module is mandatory**; abstract / easily confused concepts are worth it; purely operational content is not; **at most once per lesson, and never in two consecutive rounds**.
    A Feynman question **scores conceptual understanding only**, and **that round has only that question**. If the student says "I don't want to explain, just test me" → respect that and switch to an ordinary question.
 10. **Do not modify `协议/`, `模板/`, `学科包/`, `_tools/`** — that is read-only framework; edits will collide with `git pull`.
     **When the student wants to change a rule → write it into `我的学习/我的规则.md`** (highest priority, never overwritten by framework updates). Do not edit the framework.
 11. When the student says "change it to X from now on" or "I don't like Y" — that is a **rule-level request**: offer to write it into their rules file and do it for them, otherwise it's forgotten next session.
+12. **With parallel subjects, there is only ever one "current subject"**: finish the current round before switching; other subjects' progress lives in the 📚 index "Status" column, and lesson numbers must carry a subject prefix (`Python #2`). Switch procedure: `协议/03_落档事件表.md` §7.
+    **Never run two rounds at once** (it becomes ambiguous which answer document to write).
 
 ---
 

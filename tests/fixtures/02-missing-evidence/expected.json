@@ -1,5 +1,6 @@
 {
   "status": "FAILED",
   "invariants": ["I6"],
-  "description": "📊 标 ✅ 已掌握，但回答文档的「最终复评结果」从没填过 —— 谎报掌握必须报错"
+  "forbiddenInvariants": ["I7", "I11", "I8"],
+  "description": "📊 标 ✅ 已掌握，但回答文档的「最终复评结果」从没填过 —— 谎报掌握必须报错（此时不该再报 I7/I11，因为根本没有复评正文可判）"
 }

@@ -1,0 +1,7 @@
+{
+  "status": "PASSED",
+  "invariants": [],
+  "forbiddenInvariants": ["I3", "I4", "I5", "I6", "I7", "I8", "I10", "I11", "I12"],
+  "problemCount": 0,
+  "description": "★核心回归★ 已开课的档案在更新日志里提到「尚未开始」—— 旧实现只按关键词判空模板，会把这份真实档案判成 BLANK 并静默跳过全部检查。必须正常校验且一条都不报"
+}

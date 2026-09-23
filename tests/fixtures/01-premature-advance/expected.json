@@ -1,5 +1,6 @@
 {
   "status": "FAILED",
   "invariants": ["I9"],
-  "description": "#1 在 📊 里还是「⏳ 待作答」，但 🚦 已经推进到 #2 —— 提前推进必须报错"
+  "forbiddenInvariants": ["I6", "I7", "I11", "I12"],
+  "description": "#1 在 📊 里还是「⏳ 待作答」，但 🚦 已经推进到 #2 —— 提前推进必须报错，且不许顺手误报证据类不变式"
 }

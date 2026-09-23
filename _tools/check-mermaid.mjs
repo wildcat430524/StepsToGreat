@@ -8,17 +8,19 @@
  * 而不是在 Node 里 parse —— 后者缺少 DOM，会误报 "DOMPurify.sanitize is not a function"。
  *
  * 用法：
- *   node _tools/check-mermaid.mjs           # 校验全部 md
+ *   node _tools/check-mermaid.mjs           # 校验全部 md（缺依赖则跳过）
  *   node _tools/check-mermaid.mjs --verbose # 逐图打印 OK
+ *   node _tools/check-mermaid.mjs --strict  # 缺依赖 = 失败（CI 必须用这个）
  *
- * 依赖（缺失时自动跳过，不报错，便于纯用户环境使用）：
- *   - playwright-core
- *   - 一份 mermaid 浏览器构建（render/mermaid-obsidian.min.js 或本机已有副本）
+ * 依赖（通过 devDependencies 安装）：
+ *   - playwright  / playwright-core
+ *   - mermaid
  *
- * 退出码：0 = 全过或跳过；1 = 有图渲染失败
+ * 退出码：0 = 全过；1 = 有图渲染失败，或 --strict 下缺依赖
  */
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
@@ -26,46 +28,140 @@ import { createRequire } from 'node:module';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VERBOSE = process.argv.includes('--verbose');
+/** 严格模式：缺依赖直接失败。CI 一律走这个，避免「装不上 → 静默跳过 → 绿灯」。 */
+const STRICT = process.argv.includes('--strict') || process.env.DSH_MERMAID_STRICT === '1';
 const SKIP_DIRS = new Set(['node_modules', '.git', '资料']);
 
-/** 本机已有的依赖（开发环境）；缺失则跳过 */
-const CANDIDATES = {
-  playwright: [
-    path.join(ROOT, 'node_modules', 'playwright-core', 'index.js'),
-    'E:/playground/_diagram_upgrade/node_modules/playwright-core/index.js',
-  ],
-  mermaid: [
-    path.join(ROOT, 'render', 'mermaid.min.js'),
-    path.join(ROOT, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js'),
-    'E:/playground/_diagram_upgrade/render/mermaid-obsidian.min.js',
-  ],
-  chromium: [
-    'C:/Users/Administrator/AppData/Local/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-win64/chrome-headless-shell.exe',
-  ],
-};
+const req = createRequire(import.meta.url);
 
-function firstExisting(list) {
-  for (const p of list) if (fs.existsSync(p)) return p;
+/** 依赖解析：优先本仓库 node_modules，其次同机已有副本（开发者环境）。 */
+function resolvePlaywright() {
+  for (const name of ['playwright', 'playwright-core']) {
+    try {
+      return req.resolve(name);
+    } catch { /* 继续找 */ }
+  }
+  // 同机副本（仅在非 CI 的开发者环境兜底）
+  if (!process.env.CI) {
+    const alt = 'E:/playground/_diagram_upgrade/node_modules/playwright-core/index.js';
+    if (fs.existsSync(alt)) return alt;
+  }
   return null;
 }
 
-const pwPath = firstExisting(CANDIDATES.playwright);
-const mmPath = firstExisting(CANDIDATES.mermaid);
-const crPath = firstExisting(CANDIDATES.chromium);
+function resolveMermaid() {
+  try {
+    return req.resolve('mermaid/dist/mermaid.min.js');
+  } catch { /* 继续找 */ }
+  const local = [
+    path.join(ROOT, 'render', 'mermaid.min.js'),
+    path.join(ROOT, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js'),
+  ];
+  for (const p of local) if (fs.existsSync(p)) return p;
+  if (!process.env.CI) {
+    const alt = 'E:/playground/_diagram_upgrade/render/mermaid-obsidian.min.js';
+    if (fs.existsSync(alt)) return alt;
+  }
+  return null;
+}
+
+/**
+ * 定位 Chromium 可执行文件（**跨平台**）。
+ *
+ * 旧实现把 Windows 路径 `C:/Users/Administrator/...` 写死，
+ * 在 ubuntu-latest 上必然找不到 → 脚本「跳过」并返回 0 →
+ * CI 看起来全绿，实际上 11 张 mermaid 图一张都没验证过。
+ *
+ * 现在优先问 playwright 自己（它知道浏览器装在哪），再退回手动扫描
+ * `ms-playwright` 目录 —— Windows / macOS / Linux 都能命中。
+ */
+function resolveChromium(mod) {
+  // ① playwright 自己报的路径最可靠
+  try {
+    const chromium = mod.chromium || (mod.default && mod.default.chromium);
+    if (chromium && typeof chromium.executablePath === 'function') {
+      const p = chromium.executablePath();
+      if (p && fs.existsSync(p)) return p;
+    }
+  } catch { /* 未安装浏览器时会抛错，继续走扫描 */ }
+
+  // ② 扫描 ms-playwright 缓存目录（跨平台）
+  const roots = [
+    process.env.PLAYWRIGHT_BROWSERS_PATH,
+    process.platform === 'win32' && process.env.LOCALAPPDATA
+      ? path.join(process.env.LOCALAPPDATA, 'ms-playwright')
+      : null,
+    process.platform === 'darwin'
+      ? path.join(os.homedir(), 'Library', 'Caches', 'ms-playwright')
+      : null,
+    path.join(os.homedir(), '.cache', 'ms-playwright'),
+  ].filter(Boolean);
+
+  const names = process.platform === 'win32'
+    ? ['chrome-headless-shell.exe', 'chrome.exe']
+    : ['chrome-headless-shell', 'chrome'];
+
+  for (const root of roots) {
+    if (!fs.existsSync(root)) continue;
+    let entries;
+    try {
+      entries = fs.readdirSync(root);
+    } catch { continue; }
+    for (const dir of entries) {
+      if (!/^chromium/.test(dir)) continue;
+      for (const sub of walkFiles(path.join(root, dir), 4)) {
+        if (names.includes(path.basename(sub))) return sub;
+      }
+    }
+  }
+  return null;
+}
+
+function walkFiles(dir, depth) {
+  if (depth < 0) return [];
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch { return []; }
+  const out = [];
+  for (const e of entries) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) out.push(...walkFiles(p, depth - 1));
+    else out.push(p);
+  }
+  return out;
+}
+
+const pwPath = resolvePlaywright();
+const mmPath = resolveMermaid();
+
+let mod = null;
+let crPath = null;
+if (pwPath) {
+  mod = req(pwPath);
+  crPath = resolveChromium(mod);
+}
 
 if (!pwPath || !mmPath || !crPath) {
+  const missing = [];
+  if (!pwPath) missing.push('playwright / playwright-core');
+  if (!mmPath) missing.push('mermaid');
+  if (!crPath) missing.push('无头 Chromium');
+
+  if (STRICT) {
+    console.error(`\n❌ 缺少 mermaid 校验依赖：${missing.join('、')}`);
+    console.error('   严格模式（CI）下不允许静默跳过。请先安装：');
+    console.error('   npm ci && npx playwright install --with-deps chromium\n');
+    process.exit(1);
+  }
   console.log('\n⚠️  缺少 mermaid 校验依赖，跳过图形校验：');
-  if (!pwPath) console.log('   - playwright-core 未找到');
-  if (!mmPath) console.log('   - mermaid 浏览器构建未找到');
-  if (!crPath) console.log('   - 无头 Chromium 未找到');
-  console.log('   这一步不是必过项（CI 里可选）。安装后可启用：');
-  console.log('   npm i -D playwright-core mermaid && npx playwright install chromium\n');
+  for (const m of missing) console.log(`   - ${m}`);
+  console.log('   这一步在本地是可选项；CI 用 --strict 强制要求。安装：');
+  console.log('   npm ci && npx playwright install chromium\n');
   process.exit(0);
 }
 
-// playwright-core 是 CJS 包，用 createRequire 加载（ESM import 拿不到具名导出）
-const require = createRequire(import.meta.url);
-const { chromium } = require(pwPath);
+const { chromium } = mod;
 const MERMAID_SRC = fs.readFileSync(mmPath, 'utf8');
 
 // ── 抽取 mermaid 块 ───────────────────────────────────────────

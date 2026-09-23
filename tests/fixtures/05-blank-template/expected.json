@@ -1,5 +1,6 @@
 {
   "status": "BLANK",
   "invariants": [],
+  "forbiddenInvariants": ["I3", "I6", "I7", "I9"],
   "description": "出厂时的空档案必须被识别为 NEW(BLANK) 并跳过检查 —— 不能误报，也不能当已开启校验"
 }

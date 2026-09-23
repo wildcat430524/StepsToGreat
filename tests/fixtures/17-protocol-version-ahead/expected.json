@@ -1,0 +1,6 @@
+{
+  "status": "FAILED",
+  "invariants": ["I12"],
+  "forbiddenInvariants": ["I6", "I7", "I11"],
+  "description": "档案声明的协议版本高于本工具支持的版本 —— 旧工具会继续用旧口径校验并给出「通过」的假安全感。必须由 I12 明确拒绝，提示先 git pull 更新工具"
+}
