@@ -15,6 +15,42 @@ then records your progress so you can pick up where you left off.
 
 [简体中文](./README.md) | English
 
+**Contents**
+
+[Start in 60 seconds](#start-in-60-seconds) ·
+[Why this exists](#why-this-exists) ·
+[Learning a book](#want-to-learn-a-book-or-any-material-properly-send-it-to-the-ai-it-teaches-you-step-by-step) ·
+[Who it's for](#who-its-for-and-who-its-not-for) ·
+[How it works](#how-it-works) ·
+[Core mechanics](#core-mechanics) ·
+[A full walkthrough](#a-complete-conversation-walkthrough) ·
+[How these rules were verified](#how-these-rules-came-to-be-measured-not-guessed) ·
+[Five-minute setup](#five-minute-setup) ·
+[What you can learn](#what-you-can-learn) ·
+[Learning rules](#learning-rules-make-them-yours) ·
+[Supported AI tools](#supported-ai-tools) ·
+[Want the skill version?](#want-install-once-use-everywhere-theres-a-skill-version) ·
+[Layout](#layout) ·
+[FAQ](#faq) ·
+[Going deeper](#going-deeper) ·
+[License](#license)
+
+---
+
+## Start in 60 seconds
+
+**Don't read any further yet.** Just four things:
+
+| # | Do this | You should see |
+|---|---|---|
+| **1** | Open this **folder** in an AI tool (not a file inside it) | `AGENTS.md` appears in the file tree |
+| **2** | Say: `I'm the student. Read AGENTS.md first, then begin.` | The AI says it has read the protocol and recites the rule count |
+| **3** | Ask it: `How many hard rules does AGENTS.md have?` | **12** = the rules are actually live |
+| **4** | Just say what you want to learn | It probes your goals → placement test → lesson 1 |
+
+> **Stuck?** [Troubleshooting decision tree](./教程/界面示意图.md#9-遇到问题先看这张图)｜**Which tool?** [Five steps](#five-minute-setup)
+> **Time budget**: ~3 min to install a tool (Trae download) + ~10 min of probing/placement before lesson 1.
+
 ---
 
 ## Why this exists
@@ -28,6 +64,7 @@ AI is already good enough to teach. **What was always missing isn't content — 
 | You get something wrong; the AI says "not quite" — and you still don't know where | Small mistakes are **fixed for you**, with the full "what you wrote → what's wrong and why → what I changed it to" |
 | Close the chat and it forgets everything | State is written to files: **switch tools, come back a month later, keep going** |
 | Switch AI tools and lose all your history | Your data is plain Markdown — **portable across any tool** |
+| You own a book or a document, and quit after three pages | **Send it to the AI — it splits the material into lessons and walks you through, one at a time** |
 
 ### Versus just asking an AI
 
@@ -40,6 +77,31 @@ AI is already good enough to teach. **What was always missing isn't content — 
 | **Probes your actual needs** | ❌ You say "teach me English" and it just starts | ✅ **Keeps asking until it's sure it understands you** |
 | Switching tools | ❌ History lost | ✅ Works anywhere |
 | Who owns the data | The platform | ✅ Your own folder |
+
+### How these rules came to be: measured, not guessed
+
+**This section is where the project differs most from "yet another prompt collection."** Every rule should be traceable to the test that forced it into existence.
+
+| # | How it was verified | What it caught | Report |
+|---|---|---|---|
+| **1** | **8 subject simulations** — an AI plays tutor through full teaching dialogues (real errors, repeated probing, frustration), then defects are extracted from the transcripts | All 8 subjects **needed patching**; **6 shared one core symptom** (can't decide whether an error is ② or ③) → hence the verdict mnemonic | [`docs/simulations/`](./docs/simulations/) |
+| **2** | **Weak models as probes** — deliberately run at the lowest reasoning effort, because strong models **guess** their way past unclear protocol and hide the defect | Protocol itself **12/12**; plus 4 real defects (2 internal document contradictions + 2 protocol gaps) | [`docs/weak-model/WEAK-MODEL-REPORT.md`](./docs/weak-model/WEAK-MODEL-REPORT.md) |
+| **3** | **End-to-end run** — the whole path: first use → placement → roadmap → lesson 1 → three rounds → lesson closed → state filed | 1 protocol gap + **1 broken-link defect in the templates that would hit every user** + 2 validator false positives | [`docs/E2E-RUN-REPORT.md`](./docs/E2E-RUN-REPORT.md) |
+| **4** | **State validator** — 12 invariants checking whether your profile is self-consistent | Catches "marked mastered with no re-assessment evidence", "advanced before the previous lesson passed", "two re-assessment sections in one file" | [`协议/04_状态机.md`](./协议/04_状态机.md) + [`tests/`](./tests/) (19 regression cases) |
+
+**Three numbers behind "adding rules ≠ adding value"**:
+
+| Number | Meaning |
+|---|---|
+| **All 8 subjects needed patching** | The three-dimension **mechanism** is complete, but the **criteria** are described per dimension rather than per error |
+| **133 suggestions → only 5 adopted** | The reports' value is **evidence**; rules take only what causes criteria to fight. **7 suggestions were explicitly rejected**, with reasons written down |
+| **12 invariants + 19 regression cases** | "A real failure first, then a rule" — every invariant traces back to the test that exposed it |
+
+> **The single most important finding** (from the 8 simulations):
+> **The three-dimension *mechanism* is complete, but the *criteria* are described per dimension, not per error.**
+> What a tutor actually needs is the reverse: **given an error, look up which dimension it belongs to.**
+> Fixing that one thing was worth more than fixing all 133 suggestions — which is exactly where the verdict
+> mnemonic in [`协议/00_导师协议.md`](./协议/00_导师协议.md) §3 came from.
 
 ### Why the results differ: the AI keeps probing until it truly understands you
 
@@ -78,6 +140,100 @@ an input to the placement test and the course route. When you later ask "why is 
 the answer traces back to what you confirmed on day one.
 
 > This probing behaviour is written into `AGENTS.md` too — **whatever AI tool you use, it will ask the same way**.
+
+### When you haven't decided yet: let it interrogate you
+
+Sometimes you don't want to learn a subject — you want to **think one thing through**: should we switch approaches, what is this requirement actually asking, how should this decision land.
+What's missing isn't an answer; it's **someone who keeps asking until you run out of things to say**.
+
+Pointed at a decision, the same probing machinery behaves like this:
+
+| Rule | What it says |
+|---|---|
+| **Only ask what can be asked now** | Every question rests on decisions that are **already settled**; anything depending on another open question waits for a later round |
+| **Whole round at once + a recommended answer** | Every question in the current frontier is listed and numbered, each with **its recommended answer** — you just say "agreed" or "change it" |
+| **Your answers grow the next round** | Settled decisions push the frontier outward and unblock questions that couldn't be asked before; round after round, until **nothing is left open** |
+| **It looks up facts, you make the calls** | Anything findable in the files is not put to you; only "it's your call" questions reach you |
+| **Nothing happens until you confirm** | You restate the understanding, both sides agree, and only then does it start |
+
+**Capture as you go**: the conclusions can be written straight into two documents —
+
+① **Decision records**: one entry = context / options / what was decided / why — see [`docs/adr/`](./docs/adr/);
+② a **glossary**: one word, one meaning across the project — see [`CONTEXT.md`](./CONTEXT.md).
+The point is plain: **three months from now, you can still remember why you decided it that way.**
+
+> The one-line difference: a **placement test** fixes where you start (questions, no score); an **interrogation** fixes a decision (no questions, no right answer — it's your call).
+
+---
+
+## Want to learn a book (or any material) properly? Send it to the AI — it teaches you step by step
+
+**This is the most common way people use the project**: you don't need prior knowledge or an outline —
+**drop the book or document in, and the AI splits it into lessons, explains, quizzes, grades, and keeps your progress.**
+
+```
+You: My material is in 资料/ — the full PDF of <BOOK>. I want to actually learn it.
+
+AI:  (reads the files first → maps the real table of contents and content)
+     Before we start, let me make sure I've truly understood you:
+     1. How deep do you need to go? a) pass an exam  b) be able to use it  c) be able to teach it
+     2. How long can you consistently study each day?
+     3. Which chapters matter most / which can be skipped?
+     (you answer → the AI restates it → you confirm)
+
+AI: Lesson 1 · Chapter 1 <the actual section name>
+    📁 Files: 我的学习/学科/<SUBJECT>/01-第1章/
+    📖 Key points: … (**from <BOOK>, chapter 1 section 2**)
+    ✅ Your task: round 1, 2 questions (1–3 per round)
+    → you answer in 01_学生回答.md → say "done"
+
+AI:  (re-reads your answers → three-dimension assessment → small problems fixed
+     directly and explained / big ones you derive yourself) → all ✅ → files it
+     → **appends round 2 / ships lesson 2**
+```
+
+**All you ever say is "done"**. Everything else — placement → the book's **real structure** split into lessons →
+two documents per lesson → three-dimension assessment → filing → next lesson — is the protocol's job.
+
+### Versus asking an AI to "summarise this book"
+
+| | "Summarise this book for me" | StepsToGreat |
+|---|---|---|
+| Output | A few thousand words of summary you read and forget | **One lesson at a time**, each one making you answer |
+| Verification | ❌ None | ✅ Three dimensions; all ✅ required before advancing |
+| Where you stopped | One pass and it's over | **Written to `00-学习档案.md`** — close it and resume anytime |
+| When you're wrong | The summary glosses over it | Small mistakes fixed + explained; big ones you derive |
+| Citation | "The book mentions…" (unverifiable) | **"from `<file>` section `<specific section>`"** (checkable) |
+| Halfway through | Start over by asking again | Come back a month later and say "continue" |
+
+### How to send it (three steps)
+
+| Step | What to do |
+|---|---|
+| **1. Put it in** | Copy the file into [`资料/`](./资料/) (subfolders as you like, e.g. `资料/考研数学/`). **One item at a time — don't dump ten books in** |
+| **2. Say one line** | "My material is in `资料/` — I want to properly learn <BOOK>, my goal is …, I have X minutes a day" |
+| **3. Start answering** | The AI probes + runs a placement test, then ships lesson 1. After that you just answer and say "done" |
+
+| Format | Support |
+|---|---|
+| `.md` `.txt` | ✅ Best |
+| `.pdf` (text-based) | ✅ Good (**scans need OCR**) |
+| `.docx` `.pptx` | ⚠️ Mediocre — save as `.md` instead |
+| Images | ⚠️ Depends on the tool's vision support |
+| Video | ❌ The AI can't read it — **give subtitles or your own notes** |
+
+> Full details and discipline (**append-only** / never committed to git / note the source): [`资料/README.md`](./资料/README.md)
+
+### Three hard constraints (so the AI can't fob you off)
+
+| Constraint | What it means |
+|---|---|
+| **Teach from the actual content** | The tutor must read your file — **no inventing chapter numbers or quotes from memory** |
+| **Cite down to the section** | Every point must be traceable to "from `<file>`, section N" — if it can't, it hasn't read it |
+| **No fabricated reading lists** | The project **won't** hand you unverifiable book/chapter references; with no material, it simply explains the content itself |
+
+> 💡 **No book handy?** It still works — say "I want to learn X, my background is Y" and the tutor writes the
+> content into the lesson documents itself. Same rules; `资料/` makes it **better**, not **mandatory**.
 
 ---
 
@@ -167,6 +323,24 @@ Every topic is assessed on three **independent** dimensions — the soul of the 
 Form alone → pretty but wrong. Collapse them into one "overall score" and you can no longer tell
 "understood but slipped" from "didn't understand at all" — and those need completely different responses.
 
+#### Which dimension does an error belong to? — the verdict mnemonic
+
+The hard part in practice isn't "what are the three dimensions" — it's that **given a concrete error, you can't tell which dimension it belongs to.**
+In the 8 subject simulations, **6 subjects shared this exact core symptom** — and being unable to decide means **verdicts aren't reproducible**
+(two tutors mark the same paper differently), while the whole "all ✅ before advancing" mechanism rests on verdicts being deterministic.
+
+So the protocol §3 provides this mnemonic, asked in order:
+
+| Order | Question | Dimension |
+|---|---|---|
+| 1 | Is what the student **said itself wrong** (concept, term, fact)? | **① Concept** |
+| 2 | Concepts fine, but **the reasoning chain is broken / doesn't hold**? | **② Logic** |
+| 3 | Everything above fine, it just **doesn't match the subject's formal rules**? | **③ Form** |
+
+**Mnemonic: said it wrong → ①; thought it wrong → ②; wrote it wrong → ③.**
+Hits two at once → **take the earlier one** (① > ② > ③); **Feynman questions score ① only**, the other two marked `— n/a`.
+Per-subject boundary case tables live alongside each pack in `学科包/` (only the contentious ones — the full criteria aren't duplicated).
+
 ### 2. Small mistakes get fixed for you; big ones you derive yourself
 
 Typos, single-point syntax, missing symbols — **small problems**, and the AI **fixes them directly**
@@ -218,7 +392,20 @@ Problem 1 was fine — you got it right. Tell me when you've fixed it, and we'll
 
 So you can **close it and come back any time** and pick up where you left off.
 
-### 3. The Feynman technique: can't explain it = don't really know it
+**Why exactly three places?** Because writing the same progress fact in five places means
+**the next reader can't tell which one is authoritative**. That isn't a theoretical worry —
+a weak model **really did** write two "final re-assessment" sections in one answer document
+(one filled in, one still a blank placeholder), and the validator of the day couldn't catch it
+(it only looked at the first section, and passed it because that one was filled).
+Invariant I11 exists specifically to catch "the same information written in more than one place".
+
+> **How do you check the state hasn't gone crooked?** Run `node _tools/validate-state.mjs` — it checks your
+> profile against the **12 invariants** in [`协议/04_状态机.md`](./协议/04_状态机.md).
+> Every one of those invariants was **dug out of a real failure**: I11 from the weak-model slip above;
+> I2/I6/I7/I8/I10/I12 from a self-audit that found six places where a document could "pass by formatting alone".
+> The 19 regression cases live in [`tests/`](./tests/).
+
+### 4. The Feynman technique: can't explain it = don't really know it
 
 **The most dangerous thing isn't "not knowing" — it's "thinking you know".**
 
@@ -569,7 +756,7 @@ Shall we do that review question now? (1 question covering variables / data type
 
 > Want to verify these mechanisms are actually written into the protocol? See
 > [`协议/00_导师协议.en.md`](./协议/00_导师协议.en.md) (three-dimension assessment, direct-fix protocol, 1–3 questions per round, Feynman technique)
-> and [`AGENTS.md`](./AGENTS.md) (11 hard rules). **The dialogue is the protocol's output, not decoration.**
+> and [`AGENTS.md`](./AGENTS.md) (12 hard rules). **The dialogue is the protocol's output, not decoration.**
 
 ---
 
@@ -697,7 +884,7 @@ On conflict, the higher one wins:
 
 ## Supported AI tools
 
-**25+ tools** (currently 26 pointer files, covering 28+ tools), via "one contract + auto-generated pointers":
+**25+ tools** (currently 25 pointer files + 1 source of truth, covering 28+ tools), via "one contract + auto-generated pointers":
 
 ```
 your tool → the file it reads (CLAUDE.md / CODEBUDDY.md / .trae/rules / GEMINI.md …)
@@ -714,23 +901,60 @@ Change a rule in exactly one place (`AGENTS.md`); the other 25 pointer files are
 
 ---
 
+## Want "install once, use everywhere"? There's a skill version
+
+This repo is the **folder** form: open the folder in an AI tool and it becomes your tutor. That's the lowest-friction path — nothing to install.
+
+But the folder form has three hard limits, **all caused by the form, not the protocol**:
+
+| Folder-form limit | What it looks like |
+|---|---|
+| Rules **travel with the repo** | A new project means dropping the folder in again |
+| Triggering depends on **whether the tool reads `AGENTS.md`** | 25 pointer files covering 28+ tools, still maintained one by one |
+| Content **drifts when hand-copied** | Change a rule, forget a copy |
+
+**The same protocol also ships as a skill**: [**Steps2Great-skill**](https://github.com/wildcat430524/Steps2Great-skill) —
+install it once into your skills directory and every project and session can trigger it.
+
+| | **StepsToGreat** (this repo) | [Steps2Great-skill](https://github.com/wildcat430524/Steps2Great-skill) |
+|---|---|---|
+| Form | A folder (open it and it's your tutor) | An Agent Skill (install into any skills-capable client) |
+| Install | **Nothing to install** | One line: `npx skills add wildcat430524/Steps2Great-skill` |
+| Trigger | `AGENTS.md` + 25 per-tool pointers | Frontmatter `description` (bilingual trigger words) |
+| Content | The repo itself | **Mirrors** this repo + a hand-written `SKILL.md` |
+| Best for | "One folder carries everything"; reading all the design docs | "Install once, use everywhere"; distributing / sharing with a team |
+| Data | Your folder | Your workspace — **both plain Markdown, mutually resumable** |
+
+**They are two shells around one protocol**: change a teaching rule here, and the skill syncs it via
+`node _build/sync-from-upstream.mjs` — nothing hand-copied, so nothing drifts.
+
+> **Which to pick**: everyday self-study, least fuss → use **this repo** (open the folder and go).
+> Already living in Claude Code / Cursor / Codex and want "install once, works everywhere" →
+> use the **[skill version](https://github.com/wildcat430524/Steps2Great-skill)**.
+> You can use both; your records are plain Markdown, so you can switch shells and keep learning.
+
+---
+
 ## Layout
 
 ```
 StepsToGreat/
-├── AGENTS.md                    ← the single contract (AI starts here)
+├── AGENTS.md                    ← the single contract (AI starts here; all 25 pointers target it)
 ├── AGENTS.en.md                 ← English version
 ├── CONTEXT.md                   ← glossary (keeps terms from blurring)
-├── 协议/                         ← teaching rules: 3-dimension assessment / direct-fix / placement / filing / **state machine**
-├── 学科包/                       ← per-subject assessment criteria
+├── 协议/                         ← teaching rules: 3-dimension assessment + verdict mnemonic / direct-fix / placement / filing / **state machine**
+├── 学科包/                       ← per-subject assessment criteria + boundary case tables
 ├── 模板/                         ← blank templates
 ├── 示例/                         ← 5-minute demo of the whole loop
 ├── 教程/                         ← setup / per-tool guides / UI mockups / design notes
-├── _tools/                       ← pointer generator + content checks + **state validation**
-├── tests/fixtures/               ← regression fixtures for state validation (deliberately broken profiles)
-├── docs/                         ← compatibility matrix + 9 ADRs
+├── _tools/                       ← pointer generator + content checks + mermaid check + **state validation (12 invariants)**
+├── tests/                        ← regression fixtures for state validation (19 deliberately broken profiles + expected verdicts)
+│   └── fixtures/                 ← each = one broken profile + expected.json
+├── docs/                         ← compatibility matrix + E2E report + weak-model report + 9 ADRs
+│   ├── simulations/              ← 8 subject simulations (where the protocol improvements came from)
+│   └── weak-model/               ← the weak-model-as-probe report and raw self-reports
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
-│   ├── 00-学习档案.md            ← overall progress state
+│   ├── 00-学习档案.md            ← overall progress state (only 🚦 / 📊 / ⏳ are maintained)
 │   └── 我的规则.md               ← [YOUR RULES] highest priority, edit freely
 └── 资料/                         ← [YOUR MATERIAL] the AI reads this
 ```
@@ -752,6 +976,18 @@ The protocol is free. Most AI tools have free tiers (Trae CN: 500 credits/month)
 **Do I need to be technical?**
 No. Opening a folder and typing is enough. **The learner installs no Node / npm / Git.**
 
+**Can I throw a whole book at it and study that?**
+Yes — that's the most common way to use it. Put the book in `资料/`, say "I want to properly learn this",
+and the tutor first probes your goal and available time, then splits the book by its **actual chapters** into
+one lesson at a time. Each lesson ends in questions; you answer and say "done"; all three dimensions must be ✅
+before the next lesson ships. Progress is written to disk, so if you don't finish, just say "continue" next time.
+See [Want to learn a book (or any material) properly?](#want-to-learn-a-book-or-any-material-properly-send-it-to-the-ai-it-teaches-you-step-by-step).
+
+**Will the AI make up what's in the book?**
+No — teaching from memory is forbidden (`AGENTS.md` hard rule 8): content must come either from the files you put
+in `资料/` or from a specific, verifiable primary source, and citations must go down to "which file, which section".
+**It will never hand you a reading list you can't check.**
+
 **Will my material be uploaded?**
 Some tools do (Trae temporarily uploads for indexing; CodeBuddy's personal edition goes through Tencent Cloud).
 **For sensitive material, use a tool that supports local models** (Zed / goose + Ollama).
@@ -768,6 +1004,42 @@ The protocol itself is fully offline. The *tutor* is an AI, so it needs a model 
 **How do I contribute a subject pack?**
 Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包模板.md), fill in 7 parts. **Most needed: music, fitness, drawing, writing, software operation.**
 
+**Why three dimensions? Can't I just collapse them into one score?**
+No — that throws away the project's most important signal. Keeping them separate is what lets you tell
+"**understood but slipped**" from "**didn't understand at all**". The first is fixed for you on the spot;
+the second needs Socratic guidance. Collapsed into one score, both look like "60 marks" — yet they call for opposite responses.
+
+**What if I can't tell which dimension an error belongs to?**
+Use the mnemonic in [`协议/00_导师协议.md`](./协议/00_导师协议.md) §3:
+**said it wrong → ①; thought it wrong → ②; wrote it wrong → ③**, and if it hits two, take the earlier one.
+That mnemonic is a direct product of the 8 subject simulations — 6 subjects' core symptom was exactly "can't decide".
+
+**The rules are editable — so could I change "all ✅ to advance" into "close enough"?**
+Technically yes (write it in `我的学习/我的规则.md`; it has the highest priority).
+But **doing so demotes the project to an ordinary chat assistant** — that rule is the core mechanism, not an optional extra.
+It's your call; the cost is stated up front.
+
+**How do I know the protocol was actually followed?**
+Run the state validator, which checks your profile against the 12 invariants in [`协议/04_状态机.md`](./协议/04_状态机.md):
+
+```bash
+node _tools/validate-state.mjs --root .            # validate your workspace
+npm run verify                                     # run every framework check (5 checkers)
+```
+
+It catches "marked mastered with no re-assessment evidence", "advanced before the previous lesson passed",
+"two re-assessment sections in one file". CI runs it on every push.
+
+**How do I know these rules actually work rather than being armchair theory?**
+Four kinds of measured evidence, all in the repo: 8 subject simulations, weak models as probes,
+an end-to-end run, and a state validator with 19 regression cases.
+See [how these rules came to be](#how-these-rules-came-to-be-measured-not-guessed).
+
+**My tool can't open a folder (e.g. a web chat) — what now?**
+Try the [skill version](https://github.com/wildcat430524/Steps2Great-skill) — it targets clients that support Agent Skills.
+If that client doesn't support skills either, you can only paste `AGENTS.md` into the conversation by hand
+(which loses the two biggest advantages: on-demand reading and state filed to disk).
+
 ---
 
 ## Going deeper
@@ -779,9 +1051,15 @@ Copy [`学科包/_自定义学科包模板.md`](./学科包/_自定义学科包�
 | What the UI looks like | [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md) |
 | **Why it's designed this way** | [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) |
 | The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (9 ADRs) |
+| **Where the rules' evidence comes from** | [`docs/simulations/`](./docs/simulations/) (8 simulations)｜[`docs/weak-model/`](./docs/weak-model/) (weak-model probe)｜[`docs/E2E-RUN-REPORT.md`](./docs/E2E-RUN-REPORT.md) |
 | Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
+| **Upgrading the framework / migrating a profile** | [`docs/UPGRADE.md`](./docs/UPGRADE.md) |
+| How to place and cite material | [`资料/README.md`](./资料/README.md) |
+| Validation criteria (the 12 invariants) | [`协议/04_状态机.md`](./协议/04_状态机.md) |
+| How the regression cases are written | [`tests/README.md`](./tests/README.md) |
 | Glossary | [`CONTEXT.md`](./CONTEXT.md) |
 | Change the rules | [`我的学习/我的规则.md`](./我的学习/我的规则.md) |
+| **Install once, use everywhere** | [Steps2Great-skill](https://github.com/wildcat430524/Steps2Great-skill) (the skill shell of this same protocol) |
 
 ---
 
