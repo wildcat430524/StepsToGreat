@@ -16,6 +16,8 @@
 
 [English](./README.en.md) | 简体中文
 
+**资料多了也能逐节教**：导师先定位，再读完整小节（含条件与例外），引用可附行号和版本指纹。可选的无依赖只读工具提供目录、搜索、完整小节读取；无需 Node 也能按同一方法读文件。见 [资料检索指南](./docs/material-retrieval.md)。
+
 **目录**
 
 [60 秒开始](#60-秒开始) ·
@@ -940,7 +942,7 @@ StepsToGreat/
 ├── _tools/                       ← 跳板生成 + 内容质检 + mermaid 校验 + **状态校验（12 条不变式）**
 ├── tests/                        ← 状态校验的回归测试集（19 组故意写坏的档案 + 期望判定）
 │   └── fixtures/                 ← 每组 = 一份坏档案 + expected.json
-├── docs/                         ← 兼容矩阵 + E2E 跑测报告 + 弱模型报告 + 9 篇 ADR
+├── docs/                         ← 兼容矩阵 + E2E 跑测报告 + 弱模型报告 + 10 篇 ADR
 │   ├── simulations/              ← 8 份学科仿真（协议改良的证据来源）
 │   └── weak-model/               ← 弱模型当探针的完整报告与原始自述
 ├── 我的学习/                     ← 【你的数据】全部记录在这里
@@ -1051,7 +1053,7 @@ npm run verify                                     # 框架自检全跑一遍（
 | 每个 AI 工具怎么接 | [`教程/02-各工具接入指南.md`](./教程/02-各工具接入指南.md) |
 | 界面长什么样 | [`教程/界面示意图.md`](./教程/界面示意图.md) |
 | **为什么这么设计** | [`教程/03-设计说明.md`](./教程/03-设计说明.md) |
-| 每个决策的取舍 | [`docs/adr/`](./docs/adr/)（9 篇） |
+| 每个决策的取舍 | [`docs/adr/`](./docs/adr/)（10 篇） |
 | **这些规矩的证据来源** | [`docs/simulations/`](./docs/simulations/)（8 份仿真）｜[`docs/weak-model/`](./docs/weak-model/)（弱模型探针）｜[`docs/E2E-RUN-REPORT.md`](./docs/E2E-RUN-REPORT.md) |
 | 工具兼容性矩阵 | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
 | **升级框架 / 迁移档案** | [`docs/UPGRADE.md`](./docs/UPGRADE.md) |

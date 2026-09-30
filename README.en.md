@@ -15,6 +15,8 @@ then records your progress so you can pick up where you left off.
 
 [简体中文](./README.md) | English
 
+**Retrieve before teaching**: locate a relevant section, then read it in full, including conditions and exceptions. Citations can include line numbers and a source fingerprint. The optional dependency-free CLI lists, searches, and reads UTF-8 Markdown/text; normal file tools work without Node. See the [retrieval guide](./docs/material-retrieval.md).
+
 **Contents**
 
 [Start in 60 seconds](#start-in-60-seconds) ·
@@ -950,7 +952,7 @@ StepsToGreat/
 ├── _tools/                       ← pointer generator + content checks + mermaid check + **state validation (12 invariants)**
 ├── tests/                        ← regression fixtures for state validation (19 deliberately broken profiles + expected verdicts)
 │   └── fixtures/                 ← each = one broken profile + expected.json
-├── docs/                         ← compatibility matrix + E2E report + weak-model report + 9 ADRs
+├── docs/                         ← compatibility matrix + E2E report + weak-model report + 10 ADRs
 │   ├── simulations/              ← 8 subject simulations (where the protocol improvements came from)
 │   └── weak-model/               ← the weak-model-as-probe report and raw self-reports
 ├── 我的学习/                     ← [YOUR DATA] everything is recorded here
@@ -1050,7 +1052,7 @@ If that client doesn't support skills either, you can only paste `AGENTS.md` int
 | Per-tool setup | [`教程/02-agent-setup-guide.en.md`](./教程/02-agent-setup-guide.en.md) |
 | What the UI looks like | [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md) |
 | **Why it's designed this way** | [`教程/03-design-notes.en.md`](./教程/03-design-notes.en.md) |
-| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (9 ADRs) |
+| The trade-offs behind each decision | [`docs/adr/`](./docs/adr/) (10 ADRs) |
 | **Where the rules' evidence comes from** | [`docs/simulations/`](./docs/simulations/) (8 simulations)｜[`docs/weak-model/`](./docs/weak-model/) (weak-model probe)｜[`docs/E2E-RUN-REPORT.md`](./docs/E2E-RUN-REPORT.md) |
 | Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
 | **Upgrading the framework / migrating a profile** | [`docs/UPGRADE.md`](./docs/UPGRADE.md) |

@@ -10,8 +10,9 @@
     "check:mermaid": "node _tools/check-mermaid.mjs",
     "check:state": "node _tools/validate-state.mjs",
     "test:state": "node _tools/validate-state.mjs --fixtures tests/fixtures",
-    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs",
-    "verify:ci": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node _tools/check-mermaid.mjs --strict"
+    "test:materials": "node --test tests/materials.test.mjs",
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node --test tests/materials.test.mjs && node _tools/check-mermaid.mjs",
+    "verify:ci": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node --test tests/materials.test.mjs && node _tools/check-mermaid.mjs --strict"
   },
   "keywords": [
     "ai-tutor",

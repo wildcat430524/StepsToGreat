@@ -36,6 +36,9 @@ jobs:
       - name: 状态校验回归测试集（18 个用例，含 forbiddenInvariants 强断言）
         run: node _tools/validate-state.mjs --fixtures tests/fixtures
 
+      - name: 资料检索回归测试
+        run: node --test tests/materials.test.mjs
+
       # CI 里 mermaid 校验**必须真跑**：--strict 下缺依赖直接失败，
       # 不再出现「浏览器没找到 → 静默跳过 → 绿灯」的假通过。
       - name: mermaid 图渲染校验（严格模式）
