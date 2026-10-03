@@ -7,11 +7,13 @@
 
 **Open this folder and you get a one-on-one tutor.**
 
-A Markdown protocol — any AI tool that opens it becomes your personal teacher:
-it runs a placement test, teaches lessons, grades your work, explains *what you got wrong and why*,
-then records your progress so you can pick up where you left off.
+A Markdown teaching protocol for an AI tool that can read and write local files and follow the rules:
+it establishes your needs, opens each new block with a concrete situation and one easy question,
+then explains, practises, grades, and saves progress so you can resume later.
 
-**Nothing to install for the learner.** No Node, no npm, no API key, no account.
+**This update: easier starts and visible achievement.** Goals become small, achievable steps. The module mastery bar is separate from the current skill checklist; tick only from evidence, give specific feedback promptly, and clearly close each small goal. See [Low-friction learning and visible achievement](#low-friction-learning-and-visible-achievement).
+
+**No project runtime is required for tutoring.** Node, npm, and retrieval scripts are optional. You still need an AI client with file access; its installation, accounts, and costs are decided by its provider.
 
 [简体中文](./README.md) | English
 
@@ -25,6 +27,7 @@ then records your progress so you can pick up where you left off.
 [Who it's for](#who-its-for-and-who-its-not-for) ·
 [How it works](#how-it-works) ·
 [Core mechanics](#core-mechanics) ·
+[This update: visible achievement](#low-friction-learning-and-visible-achievement) ·
 [A full walkthrough](#a-complete-conversation-walkthrough) ·
 [How these rules were verified](#how-these-rules-came-to-be-measured-not-guessed) ·
 [Five-minute setup](#five-minute-setup) ·
@@ -41,17 +44,17 @@ then records your progress so you can pick up where you left off.
 
 ## Start in 60 seconds
 
-**Don't read any further yet.** Just four things:
+**No long document to read first.** Start with three steps:
 
-| # | Do this | You should see |
+| # | Do this | What happens |
 |---|---|---|
-| **1** | Open this **folder** in an AI tool (not a file inside it) | `AGENTS.md` appears in the file tree |
-| **2** | Say: `I'm the student. Read AGENTS.md first, then begin.` | The AI says it has read the protocol and recites the rule count |
-| **3** | Ask it: `How many hard rules does AGENTS.md have?` | **12** = the rules are actually live |
-| **4** | Just say what you want to learn | It probes your goals → placement test → lesson 1 |
+| **1** | Open this folder in an AI tool with local file access | Have it read the root `AGENTS.md` |
+| **2** | Say: `Please read AGENTS.md first. I want to learn <X>, my goal is <Y>, and I have <Z> minutes a day.` | Missing needs are gathered together; known facts are not re-asked |
+| **3** | Answer the first small question in its situation | One sentence, judgement, or step; when stuck, shrink it instead of requiring setup or a whole exercise |
 
-> **Stuck?** [Troubleshooting decision tree](./教程/界面示意图.md#9-遇到问题先看这张图)｜**Which tool?** [Five steps](#five-minute-setup)
-> **Time budget**: ~3 min to install a tool (Trae download) + ~10 min of probing/placement before lesson 1.
+> You can answer in chat. For formal learning, the tutor files your original words unchanged, re-reads, then assesses them; direct document answers are also supported.
+> **Stuck?** [Troubleshooting decision tree](./教程/界面示意图.md#9-遇到问题先看这张图)｜**Tool setup?** [Five steps](#five-minute-setup)
+> There are **12 hard rules**, but reciting their count proves neither loading nor compliance. Use loading records, file-read traces, and actual output.
 
 ---
 
@@ -82,6 +85,8 @@ AI is already good enough to teach. **What was always missing isn't content — 
 
 ### How these rules came to be: measured, not guessed
 
+> These reports examine protocol and tool behaviour, not real learner gains. The [behaviour evaluation harness](./docs/behavior-evaluation.md) records tool events and distinguishes fixture self-tests from adapter runs; neither should be relabelled as proof of model performance or learning outcomes.
+
 **This section is where the project differs most from "yet another prompt collection."** Every rule should be traceable to the test that forced it into existence.
 
 | # | How it was verified | What it caught | Report |
@@ -110,7 +115,7 @@ AI is already good enough to teach. **What was always missing isn't content — 
 The biggest problem with an ordinary AI isn't bad answers — it's that **it never checks whether it understood you correctly**.
 You say "teach me English" and it starts teaching. Teach *whom*? For an exam or for conversation? How long can you study per day? What's your level? It knows none of this — and **it doesn't ask**.
 
-This project writes "**probe until confirmed**" into the protocol. On first contact, the AI sounds like this:
+Establish the goal, background, deadline, and available time without repeating known facts. Then every new block begins with one question in a concrete situation; a feature menu is not a story. Below is a needs-gathering example, followed by the block introduction:
 
 ```
 You: Teach me English.
@@ -134,21 +139,21 @@ AI:  Here's the goal as I understand it —
       40 minutes a day, more on weekends. Prioritise reading and listening,
       sprint writing before the exam."
 
-     Right? Correct me if anything is off. **I won't start teaching until you confirm.**
+     Correct me if anything is off. Next we will begin with one small question in a concrete situation.
 ```
 
 **The key design point**: the probing isn't small talk — it's **disambiguation**. Every answer becomes
 an input to the placement test and the course route. When you later ask "why is the course ordered this way?",
 the answer traces back to what you confirmed on day one.
 
-> This probing behaviour is written into `AGENTS.md` too — **whatever AI tool you use, it will ask the same way**.
+> Needs gathering is defined by `AGENTS.md`; check actual reads and output rather than assuming compliance. [Each block's introduction](./协议/05_对话导入.en.md) does not repeat full onboarding.
 
 ### When you haven't decided yet: let it interrogate you
 
 Sometimes you don't want to learn a subject — you want to **think one thing through**: should we switch approaches, what is this requirement actually asking, how should this decision land.
 What's missing isn't an answer; it's **someone who keeps asking until you run out of things to say**.
 
-Pointed at a decision, the same probing machinery behaves like this:
+You can also ask the AI to use the following discussion method for decisions. It is an optional questioning approach, not an automatically selected teaching mode, and does not replace formal learning assessment:
 
 | Rule | What it says |
 |---|---|
@@ -262,7 +267,8 @@ two documents per lesson → three-dimension assessment → filing → next less
 ```mermaid
 flowchart TD
     A["① First open<br/>AI reads AGENTS.md"] --> B["② Requirements<br/>asks you 3 questions"]
-    B --> C["③ Placement test<br/>5–8 questions"]
+    B --> X["Conversational introduction<br/>Concrete situation + one easy question"]
+    X --> C["③ Initial placement<br/>2–8 questions; stop once the start is clear"]
     C --> D["④ Sets your level + plans the route"]
     D --> E["⑤ Ships lesson 1"]
     E --> F["⑥ You answer"]
@@ -272,11 +278,14 @@ flowchart TD
     I --> J{"All ✅ ?"}
     J -->|"No"| K["Small: fixed directly + explained<br/>Big: you derive it yourself"]
     K --> G
-    J -->|"Yes"| L["⑩ Files the result + next lesson"]
-    L --> F
+    J -->|"Yes"| L["⑩ Saves results + specific feedback"]
+    L --> M{"All conditions for this small goal met?"}
+    M -->|"No: issue only the next current round"| F
+    M -->|"Yes"| S["Small goal complete: checklist + natural stop"]
+    S -->|"Student continues and criteria are met: introduce the next block first"| F
 ```
 
-**You only ever say two things**: the opening line, and "**done**".
+**The daily actions are simple**: answer the current question, then say "**done**". Chat answers can be filed unchanged by the tutor. Placement happens only for the initial route; subsequent blocks use the existing route and start with an introduction. Completing a small goal does not automatically add another task.
 
 ### Every lesson produces two documents
 
@@ -290,14 +299,14 @@ flowchart TD
 
 | Document | Who writes it | What's inside |
 |---|---|---|
-| **`01_教学引导.md`** | The tutor | Why learn it → core concepts → examples → old vs new → common traps → links to prior knowledge → key points → questions (by round) |
-| **`01_学生回答.md`** | **You** | This round's questions + your answers; **two placeholders at the end**: `## 最终复评结果` (per-question three-dimension table) and `## 正确答案与解析` (three-part explanations) |
+| **`01_教学引导.md`** | The tutor | Module bar and skill checklist → current step → problem → method and examples → necessary pitfalls → current-round practice (no mandatory fixed sections) |
+| **`01_学生回答.md`** | You answer; the tutor may file your chat words unchanged | This round's questions + your answers; **two placeholders at the end**: `## 最终复评结果` (per-question three-dimension table) and `## 正确答案与解析` (three-part explanations) |
 
 **Two key conventions**:
 
 | Convention | What it means |
 |---|---|
-| **The answer document is the only learning evidence** | Mastery is judged **solely by its "Final re-assessment" section** — not by what was said in chat, not by what the AI claimed |
+| **The answer document is the only learning evidence** | Chat answers are appended unchanged, then re-read and assessed. Small goals use round evidence; lesson mastery uses the final re-assessment. A claim of understanding or mastery alone is not evidence |
 | **Appended round by round, never all at once** | The answer document starts with **round 1's questions only** (1–3 of them); once that round is all ✅, the tutor **appends** the next round — otherwise you'd see every question up front, which defeats the whole point |
 
 > 💡 **Why two documents instead of one chat**:
@@ -310,6 +319,8 @@ flowchart TD
 ## Core mechanics
 
 ### 1. Three dimensions — all ✅ to advance
+
+Assess dimensions independently: **all applicable dimensions must pass**, and inapplicable ones are marked as such rather than ticked. Small-goal completion and formal lesson mastery have different conditions; see this update below.
 
 Every topic is assessed on three **independent** dimensions — the soul of the project:
 
@@ -384,7 +395,7 @@ Problem 1 was fine — you got it right. Tell me when you've fixed it, and we'll
 > otherwise the student assumes silence means something is wrong.
 > ② "**we'll move to round 2**" — a round is only 1–3 questions, and the next round comes only when this one is all ✅.
 
-### 3. State lives in exactly three places
+### 3. Three status sections in the profile
 
 | Location | Answers |
 |---|---|
@@ -394,7 +405,7 @@ Problem 1 was fine — you got it right. Tell me when you've fixed it, and we'll
 
 So you can **close it and come back any time** and pick up where you left off.
 
-**Why exactly three places?** Because writing the same progress fact in five places means
+**Status and original evidence have separate roles**: the route defines module scope; answer documents retain submissions and assessments. Do not add another authoritative progress table. Repeating one conclusion in several places means
 **the next reader can't tell which one is authoritative**. That isn't a theoretical worry —
 a weak model **really did** write two "final re-assessment" sections in one answer document
 (one filled in, one still a blank placeholder), and the validator of the day couldn't catch it
@@ -455,11 +466,49 @@ AI: Your "backpack you carry around" analogy is good — the backpack holds
 
 ---
 
+## Low-friction learning and visible achievement
+
+**Every new block starts here**: once needs are known, use a concrete situation or short story to introduce one problem and one question the student can answer now. Participation comes before explanation and practice. During introduction, defer the block's documents and do not treat an answer as mastery. See [conversational introduction](./协议/05_对话导入.en.md).
+
+**Shrink the goal**: aim for one observable outcome. The skill checklist usually has 2–4 items; a tiny goal may have one. Do not bundle a whole module, installation, or submission paperwork into the goal. When stuck, shrink the current step rather than switching to a new topic.
+
+| View | Meaning | Update condition |
+|---|---|---|
+| **Module bar** | Formally mastered units / units defined by the module route | Independently check the route, mastery table, and lesson final assessments; never calculate from checklist ticks |
+| **Current skills** | What this small goal lets the student explain, operate, or do independently | Tick from original answers and formal assessment; hinted success cannot tick an independent skill |
+
+Using “append one shopping item” to illustrate the layout, **this is fictional, not a real student's result**. The introduction starts with both items unticked; the view below is after hints are removed and independent assessment passes:
+
+**Module: Python lists**
+
+`██░░░░░░░░` **1/4 knowledge units mastered**
+
+**Current small goal: append one item to an existing shopping list**
+
+- [x] Explain that `append` adds one element to the end of a list
+- [x] Independently append an item and verify the old items remain
+
+> Current step: this small goal is complete. You can add an item without rewriting the list and stop here.
+> The module remains 1/4: the earlier “read list elements” unit is mastered. The adding unit for this goal still includes unlearned batch adding, so ticking this goal does not increase the mastered-unit count.
+
+**Timely feedback matters more than ticks**: name what the student just did and what changed, then correct or give the next step. A successful intermediate step deserves specific feedback too. Acknowledge progress under hints honestly, without claiming independence. Close with “you can now…” and do not attach a new mandatory block.
+
+**Three consistent views, with different uses**:
+- Chat: module bar → current skills → current step, followed by the short scene, feedback, or question. Repeat at starts, state changes, and resumption rather than every reply.
+- Teaching document: the same views below the title, followed by necessary principles, examples, and current practice.
+- Answer document: the same views below the title, followed by questions, original answers, and appended assessments. Update the top snapshot without overwriting history.
+
+See [small-goal progress](./协议/06_小目标进度.en.md) for display, evidence, and closure rules. Undefined scope or insufficient evidence is marked “to be determined / checked”, never an invented denominator or percentage.
+
+---
+
 ## A complete conversation walkthrough
 
-> ⚠️ **Note**: the walkthrough below is a **scenario reconstruction** — derived step by step from this
-> project's protocol, realistic and faithful to how it behaves, but **not** a verbatim transcript
-> (this project collects no user conversations). It shows what the dialogue looks like once the protocol is running.
+> This is a fictional protocol walkthrough, not a real learner assessment. Each new block starts with a conversational introduction; document excerpts below show the formal learning stage.
+
+> **Note**: the complete walkthrough below is derived step by step from the protocol, preserving
+> typical mistakes and correction steps. It is not collected user dialogue, a verbatim recording,
+> or evidence of real learner outcomes.
 >
 > Scenario: a Python beginner whose goal is "write scripts to process Excel", from first opening the folder
 > to passing lesson 3, with a one-week gap in between.
@@ -480,7 +529,7 @@ Three questions (answer them in one go):
 2. Have you done this before? → Never touched it
 3. What do you want to be able to do? → Write scripts that batch-edit Excel
 
-Then I'll run a placement test (5–8 questions, but sent in a few rounds — not dumped on you at once).
+Then I'll run a placement test (2–8 questions, but sent in a few rounds — not dumped on you at once).
 ```
 
 **You**:
@@ -644,6 +693,8 @@ Both questions of this round now pass.
 
 ### Filing + next lesson
 
+> This example assumes the student agreed to continuous learning. By default, close at the achieved outcome. A new block starts with a new scene only when the student continues and advancement criteria are met; completion alone does not add a task.
+
 **AI**:
 ```
 #3 for loops and range() closed ✅
@@ -764,23 +815,23 @@ Shall we do that review question now? (1 question covering variables / data type
 
 ## Five-minute setup
 
-### The learner installs nothing
+### No project runtime; prepare an AI tool separately
 
 | | |
 |---|---|
 | ❌ No Node.js / npm | The protocol is plain Markdown — no build step |
 | ❌ No Git | Downloading a ZIP works just as well |
-| ❌ No API key | The recommended tools ship with a free tier |
+| API keys / accounts / costs | Decided by the AI tool; this project supplies no accounts or guaranteed free tier |
 | ❌ No sign-up for this project | No server, no account, no subscription |
-| ✅ All you need | One AI tool that can open a folder |
+| ✅ Tool requirements | Local file read/write access and actual protocol loading and compliance |
 
 ### Five steps
 
-- [ ] **1. Install an AI tool** — recommended: [Trae](https://www.trae.cn): free, Chinese UI, graphical, no API key
+- [ ] **1. Install an AI tool** — for example [Trae](https://www.trae.cn) or a file-capable tool you already use. Account, plan, and installation details follow its official documentation
 
   Open the site → download for Windows → install → log in with phone / WeChat
 
-  Alternatives: **ZCode** (Z.ai — reads `AGENTS.md` natively, zero config), **CodeBuddy** (Tencent), **Qoder** (Alibaba), **Cursor**
+  Alternatives: **ZCode** (Z.ai — check its official guidance for rule loading), **CodeBuddy** (Tencent), **Qoder** (Alibaba), **Cursor**
 
 - [ ] **2. Open the folder** — `File → Open Folder` → select `StepsToGreat`
 
@@ -788,7 +839,7 @@ Shall we do that review question now? (1 question covering variables / data type
 
 - [ ] **3. Trae users: flip one switch** — `Settings (gear) → Rules → Import settings → turn on "Include AGENTS.md in context"`
 
-  > **90% of people miss this.** Most other tools need no configuration.
+  > This setup path is retained for troubleshooting. Interfaces and defaults can change; check your current client's documentation.
 
 - [ ] **4. Say the first sentence**
 
@@ -796,13 +847,13 @@ Shall we do that review question now? (1 question covering variables / data type
   I'm the student. Please read AGENTS.md first, then begin.
   ```
 
-- [ ] **5. Verify it worked** — ask it:
+- [ ] **5. Answer the first small question** — if loading needs troubleshooting, optionally ask:
 
   ```
   Recite the "Hard rules" section of AGENTS.md — how many are there?
   ```
 
-  The correct answer is **9**. Can't answer → go back to steps 2 and 3.
+  There are currently **12 rules**, but a correct count is only a diagnostic clue. Check file-read traces and output; reciting rules must not be a prerequisite for learning.
 
 📖 Full tutorial: [`教程/01-five-minute-setup.en.md`](./教程/01-five-minute-setup.en.md)
 🖼 UI mockups (plain text, no screenshots): [`教程/ui-mockups.en.md`](./教程/ui-mockups.en.md)
@@ -973,7 +1024,7 @@ updating the framework (`git pull`) will **never** overwrite your records or you
 No. Everything is plain Markdown under `我的学习/`. Switch tools → open the same folder → say "continue".
 
 **Does it cost money?**
-The protocol is free. Most AI tools have free tiers (Trae CN: 500 credits/month). The protocol is plain Markdown — no server, no account, no subscription.
+The protocol is free, plain Markdown, with no project account or subscription. AI client logins, free tiers, models, and pricing depend on the provider and may change.
 
 **Do I need to be technical?**
 No. Opening a folder and typing is enough. **The learner installs no Node / npm / Git.**
@@ -1032,10 +1083,10 @@ npm run verify                                     # run every framework check (
 It catches "marked mastered with no re-assessment evidence", "advanced before the previous lesson passed",
 "two re-assessment sections in one file". CI runs it on every push.
 
-**How do I know these rules actually work rather than being armchair theory?**
+**What verification evidence exists, and what does it establish?**
 Four kinds of measured evidence, all in the repo: 8 subject simulations, weak models as probes,
 an end-to-end run, and a state validator with 19 regression cases.
-See [how these rules came to be](#how-these-rules-came-to-be-measured-not-guessed).
+These checks examine workflow, model behaviour, and saved state, not real learner gains. See [how these rules came to be](#how-these-rules-came-to-be-measured-not-guessed).
 
 **My tool can't open a folder (e.g. a web chat) — what now?**
 Try the [skill version](https://github.com/wildcat430524/Steps2Great-skill) — it targets clients that support Agent Skills.
@@ -1057,6 +1108,9 @@ If that client doesn't support skills either, you can only paste `AGENTS.md` int
 | Tool compatibility matrix | [`docs/AGENT-COMPAT.md`](./docs/AGENT-COMPAT.md) |
 | **Upgrading the framework / migrating a profile** | [`docs/UPGRADE.md`](./docs/UPGRADE.md) |
 | How to place and cite material | [`资料/README.md`](./资料/README.md) |
+| Low-friction entry for every block | [Conversational introduction](./协议/05_对话导入.en.md) |
+| Module bar, skills, and timely feedback | [Small-goal progress](./协议/06_小目标进度.en.md) |
+| Behaviour evaluation and evidence limits | [Evaluation guide](./docs/behavior-evaluation.md) |
 | Validation criteria (the 12 invariants) | [`协议/04_状态机.md`](./协议/04_状态机.md) |
 | How the regression cases are written | [`tests/README.md`](./tests/README.md) |
 | Glossary | [`CONTEXT.md`](./CONTEXT.md) |

@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "labelProvenance": "维护者编写的合成场景与参考标签；未经独立教师标注，不能用来推断教学效果。",
+  "scenarios": [
+    {
+      "id": "reread-current",
+      "title": "学生改好了；旧聊天答案为 5，文件已经改成 4",
+      "input": {
+        "message": "学生改好了；旧聊天答案为 5，文件已经改成 4",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 = 4\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ],
+        "previousAnswer": "Q1: 2 + 2 = 5"
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "PASS",
+            "logic": "PASS",
+            "expression": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "id": "complete-submission",
+      "title": "一次评完本轮的两题",
+      "input": {
+        "message": "一次评完本轮的两题",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 = 4\nQ2: 3 + 3 = 6\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1",
+          "q2"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "PASS",
+            "logic": "PASS",
+            "expression": "PASS"
+          },
+          {
+            "id": "q2",
+            "concept": "PASS",
+            "logic": "PASS",
+            "expression": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "id": "wrong-logic",
+      "title": "结论与计算错误时等待学生修正",
+      "input": {
+        "message": "结论与计算错误时等待学生修正",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 = 5\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "PASS",
+            "logic": "FAIL",
+            "expression": "PASS"
+          }
+        ],
+        "forbidPublish": true
+      }
+    },
+    {
+      "id": "concept-revision",
+      "title": "概念错误不能代答后判掌握",
+      "input": {
+        "message": "概念错误不能代答后判掌握",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: Python 列表是不可变的。\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "FAIL",
+            "logic": "PASS",
+            "expression": "PASS"
+          }
+        ],
+        "forbidPublish": true
+      }
+    },
+    {
+      "id": "append-history",
+      "title": "评估后追加记录并保存原始回答",
+      "input": {
+        "message": "评估后追加记录并保存原始回答",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 = 4\n\n旧评估：尚未通过。\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ],
+        "archive": true
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess",
+          "write"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "PASS",
+            "logic": "PASS",
+            "expression": "PASS"
+          }
+        ]
+      }
+    },
+    {
+      "id": "read-before-write",
+      "title": "先读再追加，不能覆盖历史记录",
+      "input": {
+        "message": "先读再追加，不能覆盖历史记录",
+        "task": "archive",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "学生原答案：尚未订正。\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "write"
+        ]
+      }
+    },
+    {
+      "id": "normal-round-limit",
+      "title": "新课当前轮最多三题",
+      "input": {
+        "message": "新课当前轮最多三题",
+        "task": "publish",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。"
+        }
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "publish"
+        ]
+      }
+    },
+    {
+      "id": "custom-one-question",
+      "title": "学生自定义每轮只能一题",
+      "input": {
+        "message": "学生自定义每轮只能一题",
+        "task": "publish",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 1 题。"
+        }
+      },
+      "expected": {
+        "maxQuestions": 1,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "publish"
+        ]
+      }
+    },
+    {
+      "id": "feynman-alone",
+      "title": "这一轮只出一题费曼诊断",
+      "input": {
+        "message": "这一轮只出一题费曼诊断",
+        "task": "publish",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。"
+        },
+        "feynman": true
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "publish"
+        ]
+      }
+    },
+    {
+      "id": "feynman-dimensions",
+      "title": "费曼题只评概念理解",
+      "input": {
+        "message": "费曼题只评概念理解",
+        "task": "review",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 加法就像把两篮苹果放到一起，2 个加 2 个变成 4 个。\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ],
+        "feynman": true
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "assess"
+        ],
+        "assessments": [
+          {
+            "id": "q1",
+            "concept": "PASS",
+            "logic": "NA",
+            "expression": "NA"
+          }
+        ]
+      }
+    },
+    {
+      "id": "verified-source",
+      "title": "读取原文后引用，并绑定文件版本",
+      "input": {
+        "message": "读取原文后引用，并绑定文件版本",
+        "task": "source",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "资料/加法.md": "# 加法\n## 定义\n加法把两个数量合并。\n### 前提\n本节只讨论非负整数。\n"
+        },
+        "sourcePath": "资料/加法.md"
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "cite"
+        ]
+      }
+    },
+    {
+      "id": "unreadable-source",
+      "title": "扫描资料无法读取，明确报告缺口",
+      "input": {
+        "message": "扫描资料无法读取，明确报告缺口",
+        "task": "gap",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "资料/扫描.pdf": null
+        },
+        "sourcePath": "资料/扫描.pdf"
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustRead": [
+          "我的学习/我的规则.md"
+        ],
+        "required": [
+          "gap"
+        ],
+        "forbidCite": true,
+        "forbidPublish": true
+      }
+    }
+  ]
+}
