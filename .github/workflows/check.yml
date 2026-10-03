@@ -33,11 +33,14 @@ jobs:
       - name: 学习状态校验（不变式 I1–I12，口径见 协议/04_状态机.md）
         run: node _tools/validate-state.mjs
 
-      - name: 状态校验回归测试集（18 个用例，含 forbiddenInvariants 强断言）
-        run: node _tools/validate-state.mjs --fixtures tests/fixtures
+      - name: 状态校验回归（19 个夹具 + 9 个模型缺陷用例）
+        run: npm run test:state
 
       - name: 资料检索回归测试
         run: node --test tests/materials.test.mjs
+
+      - name: 模块图形进度条回归测试
+        run: npm run test:progress
 
       - name: 导师行为评测框架回归测试（正向对照与故意违规）
         run: npm run test:behavior

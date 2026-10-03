@@ -53,7 +53,9 @@ This is a **fictional illustration** (not a real assessment record) showing the 
 
 **Python lists · module mastery**
 
-`▰▰▱▱▱▱▱▱▱▱` **1/4** knowledge units mastered
+**1/4** knowledge units mastered
+
+![Module mastery 1/4](./docs/assets/module-progress-compact-1-of-4.svg)
 
 **Small goal｜Append an item to an existing list**
 
@@ -61,7 +63,7 @@ This is a **fictional illustration** (not a real assessment record) showing the 
 - [x] Tell **appending** apart from **overwriting**, knowing existing elements stay
 - [x] Independently call **`append`** to add an item and verify the list changed
 
-> **Complete** | You can now append an item to an existing list without rewriting it. You may stop here.
+> **Small goal complete** | You can now append an item to an existing list without rewriting it. You may stop here.
 
 *Evidence: module - meet-lists final re-assessment; skills - current formal assessments. The adding unit is not yet fully mastered, so module progress remains 1/4.*
 
@@ -140,6 +142,8 @@ be read the tutor **stops** and says what's missing instead of guessing. With no
 
 Both are **the same teaching protocol**: change a rule here and the skill picks it up with
 `node _build/sync-from-upstream.mjs` (`SKILL.md` is a hand-written entry point, maintained separately).
+
+The skill's `init-workspace.mjs --root <learning-folder> --standalone` generates the same local entry files, protocols, subject packs, templates, progress renderer and state validator. Validator fixes live in this upstream project; synchronization runs both regression suites. Framework updates preserve personal rules, profiles and original answers.
 
 > Want "install once, use everywhere"? Use the [skill version](https://github.com/wildcat430524/Steps2Great-skill).
 > Everyday self-study with the least fuss? Use this repo.

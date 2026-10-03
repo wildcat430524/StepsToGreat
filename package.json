@@ -9,12 +9,13 @@
     "check": "node _tools/check.mjs",
     "check:mermaid": "node _tools/check-mermaid.mjs",
     "check:state": "node _tools/validate-state.mjs",
-    "test:state": "node _tools/validate-state.mjs --fixtures tests/fixtures",
+    "test:state": "node _tools/validate-state.mjs --fixtures tests/fixtures && node tests/state-regression.mjs",
     "test:materials": "node --test tests/materials.test.mjs",
     "test:behavior": "node --test tests/behavior-eval.test.mjs",
     "eval:behavior": "node tools/behavior-eval.mjs",
-    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node --test tests/materials.test.mjs tests/behavior-eval.test.mjs && node _tools/check-mermaid.mjs",
-    "verify:ci": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node --test tests/materials.test.mjs tests/behavior-eval.test.mjs && node _tools/check-mermaid.mjs --strict"
+    "verify": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node tests/state-regression.mjs && node --test tests/materials.test.mjs tests/behavior-eval.test.mjs tests/progress-view.test.mjs && node _tools/check-mermaid.mjs",
+    "verify:ci": "node _tools/setup-agents.mjs --check && node _tools/check.mjs && node _tools/validate-state.mjs && node _tools/validate-state.mjs --fixtures tests/fixtures && node tests/state-regression.mjs && node --test tests/materials.test.mjs tests/behavior-eval.test.mjs tests/progress-view.test.mjs && node _tools/check-mermaid.mjs --strict",
+    "test:progress": "node --test tests/progress-view.test.mjs"
   },
   "keywords": [
     "ai-tutor",

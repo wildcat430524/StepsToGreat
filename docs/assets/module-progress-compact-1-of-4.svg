@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20" viewBox="0 0 200 20" role="img" aria-labelledby="progress-title">
+  <title id="progress-title">模块掌握：1/4 单元</title>
+  <rect x="0" y="5" width="200" height="10" rx="5" fill="#dfe8e8"/>
+  <rect x="0" y="5" width="50" height="10" rx="5" fill="#148a80"/>
+</svg>

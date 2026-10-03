@@ -5,7 +5,7 @@
  * 查什么：`我的学习/00-学习档案.md` 的三处状态（🚦 交接 / 📊 掌握 / ⏳ 待办）
  * 是否**自洽**、**有证据**、**没提前推进**。
  *
- * 判定口径 = `协议/04_状态机.md` 第 4 节的 10 条不变式（I1–I10）。
+ * 判定口径 = `协议/04_状态机.md` 第 4 节的不变式（I1–I12）。
  * 工具只校验「自洽性与证据」，不校验「教学质量」（见状态机第 6 节边界）。
  *
  * 用法：
@@ -54,7 +54,7 @@ if (argv.includes('--help') || argv.includes('-h')) {
   node _tools/validate-state.mjs --json                   机器可读输出
   node _tools/validate-state.mjs --quiet                  只输出问题
 
-判定口径见 协议/04_状态机.md 第 4 节（不变式 I1–I10）。`);
+判定口径见 协议/04_状态机.md 第 4 节（不变式 I1–I12）。`);
   process.exit(0);
 }
 
@@ -91,7 +91,8 @@ function detectBlank(p) {
     .filter((r) => !isPlaceholder(r[0] || '')).length > 0;
 
   // 📚 课次索引：有没有形如 #N 的真实课次行
-  const indexRows = /^\s*\|\s*`?#\d+/m.test(p.index);
+  const indexRows = parseTable(p.index).rows.some((row) =>
+    /#\d+/.test(row[0] || '') && row.slice(1).some((value) => !isPlaceholder(value)));
 
   return !(infoFilled || handoffFilled || masteryRows || indexRows);
 }
@@ -111,6 +112,8 @@ function isPlaceholder(v) {
   if (/^[—–-]/.test(t)) return true;
   if (/^`.+`$/.test(t) && /^`<[^>]*>`$/.test(t)) return true; // `<xxx>`
   if (/^<.*>$/.test(t)) return true;
+  // 自述尚未创建的路径只提示，不把待建状态当作缺失证据。
+  if (/(?:^|[（(])\s*(?:待建|待发布|未创建|未发布|作答后(?:创建|生成)|还没建|not yet|to be created|pending)(?:$|[（(，,:：;；\s])/i.test(t)) return true;
   return false;
 }
 
@@ -120,6 +123,14 @@ function clean(v) {
   return String(v)
     .replace(/`/g, '')
     .replace(/\*\*/g, '')
+    .trim();
+}
+
+/** 把「路径 + 括号说明」削成纯路径（仅用于真的要解析路径时） */
+function stripPathNote(v) {
+  if (v === undefined) return '';
+  return String(v)
+    .replace(/[（(][^（()）]*[)）]\s*$/g, '')
     .trim();
 }
 
@@ -326,7 +337,7 @@ function verdictIncomplete(body) {
  * 正对应本项目最忌讳的「同一信息写多处 → 不敢确定哪份准」。
  * 现有 I6 只找第一个小节，填了就通过，**抓不到这种情况**。
  */
-function checkDuplicateSections(answerText) {
+function checkDuplicateSections(answerText, checkPlaceholders = true) {
   const issues = [];
   for (const name of ['最终复评结果', '正确答案与解析']) {
     const re = new RegExp(`^##\\s*${name}\\s*$`, 'gm');
@@ -336,7 +347,7 @@ function checkDuplicateSections(answerText) {
     }
   }
   // 残留模板占位文本
-  if (/（整课所有轮次通过后由导师填写）|（评估完成后由导师填写）/.test(answerText)) {
+  if (checkPlaceholders && /（整课所有轮次通过后由导师填写）|（评估完成后由导师填写）/.test(answerText)) {
     issues.push('残留模板占位块「（整课所有轮次通过后由导师填写）」');
   }
   return issues;
@@ -406,7 +417,7 @@ function validate(rootDir) {
 
   const resolveRel = (v) => {
     if (isPlaceholder(v)) return undefined;
-    const cleaned = clean(v).split('#')[0].trim();
+    const cleaned = stripPathNote(clean(v)).split('#')[0].trim();
     if (!cleaned) return undefined;
     return resolveAny(cleaned);
   };
@@ -556,12 +567,19 @@ function validate(rootDir) {
    *  且要求它像路径（含 `/` 或以 `.md` 结尾）。 */
   const linkTarget = (cell) => {
     if (!cell) return undefined;
+    // ① markdown 链接最优先
     const m = mdLinkTarget(cell);
-    const raw = m || cell.split(/[；;，,\s]/)[0];
-    const cleaned = raw.split('#')[0].split('?')[0].trim();
-    if (!cleaned) return undefined;
-    if (!m && !/\/|\.md$/i.test(cleaned)) return undefined; // 不像路径就不当路径
-    return cleaned || undefined;
+    if (m) return m.split('#')[0].trim() || undefined;
+    // ②③④ 抠出第一个「像路径」的片段：允许中文/字母/数字/._-/ 与反引号包裹
+    const candidate = /`([^`]*?\.md\#?[^`]*)`|([\w\u4e00-\u9fa5./\-]*\.md)/i.exec(cell);
+    if (candidate) {
+      const raw = (candidate[1] ?? candidate[2]).split('#')[0].trim();
+      if (raw) return raw;
+    }
+    // 退化：整格当成单一路径（老写法）
+    const first = cell.split(/[；;，,\s]/)[0].trim();
+    if (first && /\/|\.md$/i.test(first)) return first;
+    return undefined;
   };
 
   // ── I6 / I7 / I8：掌握声明必须有证据 ──────────────────────
@@ -609,6 +627,64 @@ function validate(rootDir) {
     if (f.any) {
       problems.push(`[I7] 📊「${m.topic}」标为已掌握，但复评表里有非 ✅ 的适用维度（${f.detail}）—— 状态自相矛盾`);
     }
+  }
+
+  // ── I11（全量）：所有回答文档都查重复小节 / 残留占位 ──────
+  //
+  // 为什么必须独立成段、扫**全部**回答文档：
+  // I11 原先写在上面 `isMastered` 循环体内部，只有「某一课被标为已掌握」时
+  // 才会顺带检查那一份回答文档。后果是：一份回答文档若已经出现两份
+  // 「最终复评结果」（正是 I11 想拦的「同一信息写多处」），
+  // 而 📊 里对应行还是 `⏳ 待作答` / 尚未写入，校验器**照样 PASSED**。
+  // 弱模型实测（DeepSeek-V4.1-Flash off）就撞上了这个时序缺口 ——
+  // 它一度同时存在空占位块与已填小节，而校验器报 PASSED，是它自己 grep 才发现的。
+  // 判据本来就与「是否已声明掌握」无关：**同一文档出现两份复评区就是错的**，
+  // 无论当时掌握表写了什么。
+  {
+    const seenDocs = new Set(mastery.filter((m) => isMastered(m.status))
+      .map((m) => linkTarget(m.note) || linkTarget(answerDocFor(m.topic) || ''))
+      .filter(Boolean).map(resolveAny));
+    for (const l of lessons) {
+      // 只对**回答文档**做重复小节检查（教学文档里没有这两个小节）。
+      // 注意不要把教学文档路径先塞进 seenDocs —— 档案里「教学文档」与「回答文档」
+      // 常常指向同一个文件，先塞会让随后那一次检查被当成「已看过」而跳过。
+      const raw = l.answer;
+      if (isPlaceholder(raw)) continue;
+      const target = linkTarget(raw) || clean(raw).split('#')[0].trim();
+      if (!target || !/\.md$/i.test(target)) continue;
+      const abs = resolveAny(target);
+      if (!existsSync(abs) || !insideRoot(abs) || seenDocs.has(abs)) continue;
+      seenDocs.add(abs);
+      const dups = checkDuplicateSections(readFileSync(abs, 'utf8'), false);
+      if (dups.length) {
+        problems.push(`[I11] ${target}：${dups.join('；')} —— 同一信息写多处，接手时不敢确定哪份准`);
+      }
+    }
+    // 兜底：📚 索引没登记、但磁盘上确实存在的回答文档也要查
+    // （例如学生在摸底/中途阶段，索引还没补齐的情形）
+    const bucket = join(rootDir, '我的学习', '学科');
+    const walkAnswers = (dir) => {
+      if (!existsSync(dir)) return;
+      for (const name of readdirSync(dir)) {
+        const abs = join(dir, name);
+        let st;
+        try {
+          st = statSync(abs);
+        } catch {
+          continue;
+        }
+        if (st.isDirectory()) walkAnswers(abs);
+        else if (name === '01_学生回答.md' && !seenDocs.has(abs)) {
+          seenDocs.add(abs);
+          const dups = checkDuplicateSections(readFileSync(abs, 'utf8'), false);
+          if (dups.length) {
+            const relDoc = relative(rootDir, abs).split(sep).join('/');
+            problems.push(`[I11] ${relDoc}：${dups.join('；')} —— 同一信息写多处，接手时不敢确定哪份准`);
+          }
+        }
+      }
+    };
+    walkAnswers(bucket);
   }
 
   // ── I9：不许提前推进 ─────────────────────────────────────

@@ -230,6 +230,8 @@ for (const abs of files) {
       const target = im[1].trim();
       // 放行外部图片（徽章等）：ADR-0006 禁的是会过时的本地截图
       if (/^(https?:)?\/\//i.test(target)) continue;
+      // Deterministic progress graphics are not software screenshots (ADR-0006).
+      if (/^(?:\.\/|\.\.\/)?docs\/assets\/module-progress-compact-1-of-4\.svg$/.test(target)) continue;
       problems.push(
         `${rp}: 引用了本地图片 ${target} —— 本项目约定教程用纯文本示意图（见 docs/adr/0006）`,
       );
