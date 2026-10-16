@@ -13,7 +13,7 @@ but "what dimension ③ is called, what it judges, and what counts as an exempta
 
 | Subject | Dimension ③ | What it judges |
 |---|---|---|
-| Programming | Compilability | Code is structurally correct and runs |
+| Programming | Compilability | Judge code structure and runtime behavior from the prompt; actual execution is not required |
 | English | Expression | Grammar, tense, collocation, spelling structure |
 | Humanities | Argumentation | Argument structure, terminology, citation |
 | Science / Math | Derivation & calculation | Symbols, steps, units, computation |
