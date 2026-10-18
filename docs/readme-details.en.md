@@ -85,6 +85,8 @@ AI is already good enough to teach. **What was always missing isn't content — 
 
 ## Needs gathering and interrogation
 
+This retains the **grill-me-style questioning method** already incorporated into the project: inspect facts, resolve choices in dependency order, recommend answers, and restate understanding. Use it for initial needs clarification or an explicitly requested decision discussion; no external skill installation is required. See the [full learning workflow](./learning-workflow.en.md) for its connection to placement, conversational entry, and later teaching.
+
 ### Why the results differ: the AI keeps probing until it truly understands you
 
 The biggest problem with an ordinary AI isn't bad answers — it's that **it never checks whether it understood you correctly**.

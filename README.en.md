@@ -22,7 +22,7 @@ separate from the current skill list; tick only from evidence, give specific fee
 
 **Jump to**
 
-[Start](#start) · [Learning view](#learning-view-two-separate-layers) · [Core rules](#core-rules-at-a-glance) · [Install](#install) · [Your own material](#teach-from-your-own-material) · [Skill version](#two-shells-one-protocol) · [FAQ](#faq) · [Deeper](#going-deeper)
+[Start](#start) · [Full workflow](./docs/learning-workflow.en.md) · [Learning view](#learning-view-two-separate-layers) · [Core rules](#core-rules-at-a-glance) · [Install](#install) · [Your own material](#teach-from-your-own-material) · [Skill version](#two-shells-one-protocol) · [FAQ](#faq) · [Deeper](#going-deeper)
 
 ---
 
