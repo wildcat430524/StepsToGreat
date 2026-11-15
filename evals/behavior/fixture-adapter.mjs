@@ -21,5 +21,11 @@ export async function run({ input, tools }) {
   } else if (input.task === 'gap') {
     try { tools.readFile(input.sourcePath); }
     catch { tools.reportGap(input.sourcePath, '扫描件未取得可核对的文本，需要先提取并核验原文。'); }
+  } else if (input.task === 'qa') {
+    // Ordinary question: read the cited source, answer directly, do not grade.
+    tools.readFile(input.sourcePath);
+    tools.respond('分母相同，分数单位就相同，所以只需合并分子的份数，分母不变。');
+  } else if (input.task === 'hint') {
+    tools.respond('先看两个加数的分母是不是一样，再从分子入手。');
   }
 }

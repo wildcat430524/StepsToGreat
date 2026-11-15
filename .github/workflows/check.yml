@@ -45,6 +45,9 @@ jobs:
       - name: 导师行为评测框架回归测试（正向对照与故意违规）
         run: npm run test:behavior
 
+      - name: 入口路由与默认注入回归测试
+        run: npm run test:routing
+
       # CI 里 mermaid 校验**必须真跑**：--strict 下缺依赖直接失败，
       # 不再出现「浏览器没找到 → 静默跳过 → 绿灯」的假通过。
       - name: mermaid 图渲染校验（严格模式）

@@ -1,6 +1,6 @@
 # 导师行为评测
 
-本项目现在分别检查静态内容、学习档案自洽性，以及运行中实际发生的工具调用。行为评测覆盖 12 个合成场景：重新读取当前答案、完整评估多题、计算与概念错误、历史追加、先读后写、轮次题量、自定义题量、费曼独占与评估例外、原文引用、不可读资料。
+本项目现在分别检查静态内容、学习档案自洽性，以及运行中实际发生的工具调用。行为评测覆盖 14 个合成场景：重新读取当前答案、完整评估多题、计算与概念错误、历史追加、先读后写、轮次题量、自定义题量、费曼独占与评估例外、原文引用、不可读资料，以及**普通答疑/要提示时不批改、不落档、不为回答去读当前轮**。
 
 ## 先运行框架自测
 
@@ -16,7 +16,7 @@ node tools/behavior-eval.mjs --adapter evals/behavior/fixture-adapter.mjs --mode
 
 ## 接入真实 Agent
 
-创建一个可信的本地 ES module，导出 `async run({ input, protocol, tools })`。每次调用代表一个独立场景；将 `protocol` 和 `input.message` 交给被测 Agent，将下面六个方法映射成其真实工具。只有模型请求了对应操作，适配器才应调用该方法；不要替模型补读文件、补评估或补引用，否则测到的是适配器补救后的行为。
+创建一个可信的本地 ES module，导出 `async run({ input, protocol, tools })`。每次调用代表一个独立场景；将 `protocol` 和 `input.message` 交给被测 Agent，将下面七个方法映射成其真实工具。只有模型请求了对应操作，适配器才应调用该方法；不要替模型补读文件、补评估、补回答或补引用，否则测到的是适配器补救后的行为。
 
 | 工具 | 参数与返回 | 记录或检查 |
 |---|---|---|
@@ -26,6 +26,9 @@ node tools/behavior-eval.mjs --adapter evals/behavior/fixture-adapter.mjs --mode
 | `publishRound` | `{kind, prompt}` 数组 | 当前轮已通过、题量、一轮费曼独占 |
 | `cite` | `{path, quote, sha256}` | 指定来源已读、版本匹配、原文确有此句 |
 | `reportGap` | 路径、缺口原因 | 实际读失败后说明缺口 |
+| `respond` | 直接面向学生的回复文本 | 答疑/提示/澄清时使用；该场景不得同时 `assess` 或写学生文档 |
+
+`expected` 支持 `forbidAssess`（答疑不得变成批改）、`forbidWrite`（答疑不得写学生文档）与 `mustNotRead`（不该为这条消息读取的文件）。这三项让「普通问题直答、只有正式提交才批改」成为可执行的回归，而不只是文字约定。
 
 评估数组每项为 `{id, concept, logic, expression}`，每个维度取 `PASS`、`WARN`、`FAIL`、`NA`。题目 `kind` 取 `normal` 或 `feynman`。来源版本使用实际读到文本的 SHA-256。适配器可返回 `{usage: {inputTokens, outputTokens, costUSD}}`；没有取得真实用量时省略，不能填估计值冒充记录。
 

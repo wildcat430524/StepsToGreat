@@ -25,7 +25,7 @@ test('adapter cannot see reference labels or policy fields', async () => {
   await runScenario(find('reread-current'), ({ input, tools }) => {
     assert.equal(input.expected, undefined);
     assert.equal(input.assessments, undefined);
-    assert.deepEqual(Object.keys(tools).sort(), ['assess', 'cite', 'publishRound', 'readFile', 'reportGap', 'writeFile'].sort());
+    assert.deepEqual(Object.keys(tools).sort(), ['assess', 'cite', 'publishRound', 'readFile', 'reportGap', 'respond', 'writeFile'].sort());
   });
 });
 test('empty execution fails required actions', async () => {
@@ -148,6 +148,54 @@ test('suite schema rejects duplicates and invalid reference grades', () => {
   const broken = structuredClone(suite); broken.scenarios[0].expected.assessments[0].concept = 'OK';
   assert.throws(() => validateSuite(broken), /rubric/);
 });
+test('ordinary Q&A must not be graded or filed, and must not read the current round', async () => {
+  const graded = await runScenario(find('answer-concrete-question'), ({ input, tools }) => {
+    tools.readFile(input.rulesPath);
+    tools.readFile(input.answerPath);
+    tools.assess([pass('q1')]);
+  });
+  assert.ok(has(graded, 'no-grading-qa'), 'grading a Q&A must fail');
+  assert.ok(has(graded, 'unnecessary-read'), 'reading the current round for a Q&A must fail');
+
+  const filed = await runScenario(find('answer-concrete-question'), ({ input, tools }) => {
+    tools.readFile(input.rulesPath);
+    tools.readFile(input.sourcePath);
+    const answer = tools.readFile(input.answerPath);
+    tools.respond('分母相同，合并分子。');
+    tools.writeFile(input.answerPath, answer + '\n直接回答。\n');
+  });
+  assert.ok(has(filed, 'no-filing-qa'), 'writing to learner documents for a Q&A must fail');
+});
+
+test('a direct answer outside Q&A/hint still cannot carry a stray assessment', async () => {
+  const result = await runScenario(find('answer-concrete-question'), ({ input, tools }) => {
+    tools.readFile(input.sourcePath);
+    tools.respond('分母相同，合并分子。');
+    tools.assess([pass('q1')]);
+  });
+  assert.ok(has(result, 'no-grading-qa'));
+});
+
+test('hint request must answer without assessing the current round', async () => {
+  const graded = await runScenario(find('hint-request'), ({ input, tools }) => {
+    tools.readFile(input.rulesPath);
+    tools.readFile(input.answerPath);
+    tools.assess([pass('q1')]);
+  });
+  assert.ok(has(graded, 'no-grading-qa'), 'grading a hint request must fail');
+
+  const hinted = await runScenario(find('hint-request'), ({ tools }) => {
+    tools.respond('先看两个加数的分母是不是一样，再从分子入手。');
+  });
+  assert.equal(hinted.passed, true, JSON.stringify(hinted.findings));
+});
+
+test('suite schema rejects a non-boolean forbid flag', () => {
+  const broken = structuredClone(suite);
+  broken.scenarios[0].expected.forbidAssess = 'yes';
+  assert.throws(() => validateSuite(broken), /forbidAssess/);
+});
+
 test('summaries count failing scenarios per rule, not repeated messages', () => {
   assert.deepEqual(summarize([{ passed: false, findings: [{ rule: 'x' }, { rule: 'x' }] }]).failuresByRule, { x: 1 });
 });

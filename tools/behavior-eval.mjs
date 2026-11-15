@@ -29,11 +29,17 @@ export function validateSuite(suite) {
     if (!Number.isInteger(s.expected.maxQuestions) || s.expected.maxQuestions < 1 || s.expected.maxQuestions > 3)
       throw new Error(`Invalid question limit: ${s.id}`);
     for (const action of s.expected.required) {
-      if (!['assess', 'publish', 'write', 'cite', 'gap'].includes(action)) throw new Error(`Unknown required action: ${action}`);
+      if (!['assess', 'publish', 'write', 'cite', 'gap', 'answer'].includes(action)) throw new Error(`Unknown required action: ${action}`);
     }
     for (const row of s.expected.assessments ?? []) {
       if (!row.id || dimensions.some(d => !grades.has(row[d]))) throw new Error(`Invalid rubric: ${s.id}`);
     }
+    for (const key of ['forbidAssess', 'forbidWrite', 'forbidPublish', 'forbidCite']) {
+      if (s.expected[key] !== undefined && typeof s.expected[key] !== 'boolean') throw new Error(`Invalid ${key}: ${s.id}`);
+    }
+    if (s.expected.mustNotRead !== undefined &&
+        (!Array.isArray(s.expected.mustNotRead) || s.expected.mustNotRead.some(p => !validPath(p))))
+      throw new Error(`Invalid mustNotRead: ${s.id}`);
   }
   return suite;
 }
@@ -136,6 +142,13 @@ export async function runScenario(scenario, adapter, protocol = '') {
       if (typeof reason !== 'string' || !reason.trim()) fail('explicit-gap', 'Explain the missing evidence');
       record('gap', { path, reason });
     },
+    // A direct learner-facing reply. Replaces the round's assessment for
+    // ordinary Q&A, a hint or a clarification request; it never grades.
+    respond(text) {
+      if (typeof text !== 'string' || !text.trim()) fail('answer-shape', 'A direct answer needs non-empty text');
+      if (assessed) fail('no-grading-qa', 'Ordinary Q&A must not be turned into a formal assessment');
+      record('answer', { text });
+    },
   });
   let usage;
   try {
@@ -163,6 +176,16 @@ export async function runScenario(scenario, adapter, protocol = '') {
   }
   if (scenario.expected.forbidPublish && published) fail('no-premature-advance', 'This scenario must not publish another round');
   if (scenario.expected.forbidCite && events.some(e => e.type === 'cite')) fail('unreadable-source', 'Unreadable material is not a citation');
+  // Ordinary Q&A, a hint or a clarification request is not a formal submission:
+  // grading, filing or re-reading the whole protocol there is a regression that
+  // costs the student input tokens and pre-empts their actual request.
+  if (scenario.expected.forbidAssess && assessed) fail('no-grading-qa', 'Ordinary Q&A must not be turned into a formal assessment');
+  if (scenario.expected.forbidWrite && events.some(e => e.type === 'write'))
+    fail('no-filing-qa', 'Ordinary Q&A must not write to the learner documents');
+  for (const path of scenario.expected.mustNotRead ?? []) {
+    if (events.some(e => e.type === 'read' && e.path === path))
+      fail('unnecessary-read', `Should not read ${path} for this message`);
+  }
   return { id: scenario.id, passed: findings.length === 0, elapsedMs: Math.round(performance.now() - start), findings, events, ...(usage ? { usage } : {}) };
 }
 

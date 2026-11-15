@@ -357,6 +357,66 @@
         "forbidCite": true,
         "forbidPublish": true
       }
+    },
+    {
+      "id": "answer-concrete-question",
+      "title": "学生问具体问题：直答，不批改、不落档、不读整套协议",
+      "input": {
+        "message": "为什么 1/4 + 2/4 只加分子、分母不变？",
+        "task": "qa",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 = 4\n",
+          "我的学习/学科/数学/01-加法/01_教学引导.md": "# 加法｜教学引导\n",
+          "资料/索引.md": "# 资料索引\n\n| 文件 | 主题 |\n|---|---|\n| 分数.md | 分数加法 |\n",
+          "资料/分数.md": "# 分数\n\n## 同分母\n\n分母相同时分子相加，分母不变。\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "sourcePath": "资料/分数.md",
+        "questionIds": [
+          "q1"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "mustNotRead": [
+          "我的学习/学科/数学/01-加法/01_学生回答.md",
+          "我的学习/学科/数学/01-加法/01_教学引导.md"
+        ],
+        "required": [
+          "answer"
+        ],
+        "forbidAssess": true,
+        "forbidWrite": true,
+        "forbidPublish": true
+      }
+    },
+    {
+      "id": "hint-request",
+      "title": "学生只要提示：给提示，不判掌握",
+      "input": {
+        "message": "给个提示，别直接说答案",
+        "task": "hint",
+        "rulesPath": "我的学习/我的规则.md",
+        "files": {
+          "我的学习/我的规则.md": "每轮最多 3 题。历史回答只追加。",
+          "我的学习/学科/数学/01-加法/01_学生回答.md": "Q1: 2 + 2 =\n"
+        },
+        "answerPath": "我的学习/学科/数学/01-加法/01_学生回答.md",
+        "questionIds": [
+          "q1"
+        ]
+      },
+      "expected": {
+        "maxQuestions": 3,
+        "required": [
+          "answer"
+        ],
+        "forbidAssess": true,
+        "forbidWrite": true,
+        "forbidPublish": true
+      }
     }
   ]
 }

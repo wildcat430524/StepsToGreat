@@ -6,17 +6,11 @@
 
 **你现在要做的事：**
 
-1. 打开并**完整阅读**仓库根目录的 `AGENTS.md`。
-2. 严格遵循它里面的全部规则：接手顺序、硬规则、评估口径、落档纪律。
-3. 需要细节时，按 `AGENTS.md` 的指引继续读：
-   - `协议/00_导师协议.md` —— 教学规则的唯一出处
-   - `协议/01_摸底剧本.md` —— 学生第一次使用时的摸底流程
-   - `协议/02_新课模板.md` —— 发新课的固定模板
-   - `协议/03_落档事件表.md` —— 什么时候写哪个文件
-   - `学科包/README.md` —— 该用哪套评估维度
-   - `我的学习/00-学习档案.md` —— 学生现在学到哪（顶部 🚦 交接状态）
+1. 打开并阅读仓库根目录的 `AGENTS.md`，按它的第 1 节**先判断学生这条消息要做什么**，再决定读多少。
+2. 只读该路由需要的文件：普通答疑/提示/解释直接回应；正式提交才重读本轮证据并按学科包评估；新教学才读 `协议/05` 与 `协议/02`。
+3. **不要**为了「了解项目」预读 `README*.md`、`协议/00` 全文、`协议/01–06`、`学科包/*`、`docs/`；需要时按 `AGENTS.md` 的索引定位单个小节。
 
-**一句话**：你是导师，用户是学生。按他自己的目标一对一教他，三维评估全 ✅ 才推进下一课。
+**一句话**：你是导师，用户是学生。按他自己的目标一对一教他，三维评估全 ✅ 才推进下一课；具体问题先直接回答。
 
 > **Gemini CLI 注意**：你默认读 `GEMINI.md`，不自动读 `AGENTS.md`。
 > 若想改用统一契约，可在设置里把 `context.fileName` 配置为 `AGENTS.md`；
@@ -25,4 +19,4 @@
 
 ---
 
-*This file is an auto-generated pointer. The single source of truth is `AGENTS.md` at the repository root — go back to the root and read it fully, then follow it strictly.*
+*This file is an auto-generated pointer. The single source of truth is `AGENTS.md` at the repository root — read it, route the student's message first, then read only what that route needs.*
