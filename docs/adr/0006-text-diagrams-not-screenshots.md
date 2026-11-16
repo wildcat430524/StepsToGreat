@@ -103,3 +103,7 @@ if (/^(https?:)?\/\//i.test(target)) continue;
 
 这条边界后来被 README 引入徽章时验证过一次：首版规则过宽，把 CI 徽章也判成违规；
 收紧为「只禁本地」后，规则与 ADR 的**原始意图**才真正一致。
+
+## 例外二：项目首页（`README.md` / `README.en.md`）视觉资产
+
+仓库根目录的 `README.md` 与 `README.en.md` 面向 GitHub 访客展示项目定位、苏格拉底闭环、三维评估门控与生态架构，不属于「AI 在教学中读取的教程文本」。因此 `check.mjs` 允许 `README.md` 与 `README.en.md` 引用 `docs/assets/` 下的自绘横幅、架构图与流程示意图（仍强制校验目标文件存在），而 `教程/`、`协议/`、`学科包/`、`模板/` 等教学规范文档继续严格执行纯文本与 Mermaid 约定。

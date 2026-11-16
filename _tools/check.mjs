@@ -224,6 +224,7 @@ for (const abs of files) {
 
   // ── 本地图片引用（本项目约定：教程不用本地截图，见 ADR-0006）───
   {
+    const allowReadmeAsset = rp === 'README.md' || rp === 'README.en.md';
     let im;
     IMAGE_REF_RE.lastIndex = 0;
     while ((im = IMAGE_REF_RE.exec(prose)) !== null) {
@@ -232,9 +233,28 @@ for (const abs of files) {
       if (/^(https?:)?\/\//i.test(target)) continue;
       // Deterministic progress graphics are not software screenshots (ADR-0006).
       if (/^(?:\.\/|\.\.\/)?docs\/assets\/module-progress-compact-1-of-4\.svg$/.test(target)) continue;
+      if (allowReadmeAsset && /^(?:\.\/)?docs\/assets\/[A-Za-z0-9._-]+\.(?:png|webp|svg)$/i.test(target)) {
+        const assetAbs = join(dirname(abs), decodeURIComponent(target));
+        if (!existsSync(assetAbs)) {
+          problems.push(`${rp}: 坏图片路径 → ${target}`);
+        }
+        continue;
+      }
       problems.push(
         `${rp}: 引用了本地图片 ${target} —— 本项目约定教程用纯文本示意图（见 docs/adr/0006）`,
       );
+    }
+    if (allowReadmeAsset) {
+      const htmlImgRe = /<(?:img|source)\b[^>]*\b(?:src|srcset)=["']([^"']+)["']/gi;
+      let hm;
+      while ((hm = htmlImgRe.exec(prose)) !== null) {
+        const rawTarget = hm[1].trim().split(/\s+/)[0];
+        if (!rawTarget || /^(https?:)?\/\//i.test(rawTarget)) continue;
+        const assetAbs = join(dirname(abs), decodeURIComponent(rawTarget));
+        if (!existsSync(assetAbs)) {
+          problems.push(`${rp}: HTML 坏图片路径 → ${rawTarget}`);
+        }
+      }
     }
   }
 
